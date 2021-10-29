@@ -1,0 +1,21 @@
+MACHINE OKUMA_OSP
+
+FORMATTING
+{
+  SEQUENCE sequence_number 10 10 1 99999999
+
+  BLOCK_TEMPLATE return_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       G_return[$mom_sys_home_code]
+       X[$mom_sys_home_pos(0)]
+       Y[$mom_sys_home_pos(1)]
+       Z[$mom_sys_home_pos(2)]
+  }
+  
+  BLOCK_TEMPLATE tool_change_zero
+  {
+       T[0]
+       M[$mom_sys_tool_change_code]
+  }
+}

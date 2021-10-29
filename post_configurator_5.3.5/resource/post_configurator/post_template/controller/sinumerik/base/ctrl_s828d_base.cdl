@@ -1,0 +1,637 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+
+MACHINE SIEMENS
+
+
+EVENT high_speed_setting
+{
+   UI_LABEL "Sinumerik CYCLE832"
+   CATEGORY MILL
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive"
+      UI_LABEL "Status"
+   }
+
+   PARAM siemens_tol
+   {
+      TYPE d
+      DEFVAL "0.01"
+      TOGGLE Off
+      UI_LABEL "User Defined Tolerance"
+   }
+
+}
+
+EVENT Drill
+{
+   UI_LABEL "Drill"
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_drill_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle81"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT Drill_Bore
+{
+   UI_LABEL "Drill,Bore"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_rff
+   {
+      TYPE d
+      DEFVAL "0.0"
+      TOGGLE Off
+      UI_LABEL "Retract Feed Rate"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "END"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_bore_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle85"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Bore_Back
+{
+   UI_LABEL "Drill,Bore,Back"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Retract Distance"
+   }
+   PARAM siemens_cycle_liftoff
+   {
+      TYPE o
+      DEFVAL "Yes"
+      OPTIONS "Yes","No"
+      UI_LABEL "Lift Off(Solution Line)"
+   }
+   PARAM siemens_cycle_rpa
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "X"
+   }
+   PARAM siemens_cycle_rpo
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Y"
+   }
+   PARAM siemens_cycle_rpap
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Z"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "END"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_bore_back_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle86"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Bore_Drag
+{
+   UI_LABEL "Drill,Bore,Drag"
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_bore_drag_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle89"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Bore_Manual
+{
+   UI_LABEL "Drill,Bore,Manual"
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_bore_manual
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle87"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Bore_Nodrag
+{
+   UI_LABEL "Drill,Bore,Nodrag"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Retract Distance"
+   }
+   PARAM siemens_cycle_rpa
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "X"
+   }
+   PARAM siemens_cycle_rpo
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Y"
+   }
+   PARAM siemens_cycle_rpap
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Z"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "END"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_bore_nodrag_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle86"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT Drill_Csink
+{
+   UI_LABEL "Drill,Csink"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_gmode
+   {
+      TYPE o
+      DEFVAL "Depth"
+      OPTIONS "Depth","Diameter"
+      UI_LABEL "Geometrical Output Mode(Solution Line)"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_csink_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle82"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Deep
+{
+   UI_LABEL "Drill,Deep"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_dts_mode
+   {
+      TYPE o
+      DEFVAL "Off"
+      OPTIONS "Off","On","Seconds","Revolutions"
+      UI_LABEL "Top Dwell"
+   }
+   PARAM siemens_cycle_dts
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Top Dwell Value"
+   }
+   PARAM siemens_cycle_o_dtd_mode
+   {
+      TYPE o
+      DEFVAL "Off"
+      OPTIONS "Off","On","Seconds","Revolutions"
+      UI_LABEL "Final Dwell"
+   }
+   PARAM siemens_cycle_o_dtd
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Final Dwell Value"
+   }
+   PARAM siemens_cycle_frf
+   {
+      TYPE d
+      DEFVAL "1"
+      UI_LABEL "Feed Rate Factor"
+   }
+   PARAM siemens_cycle_o_dis1
+   {
+      TYPE d
+      DEFVAL "0.0"
+      TOGGLE Off
+      UI_LABEL "Step Clearance"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "END"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_drill_deep_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle83_deep"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Deep_Breakchip
+{
+   UI_LABEL "Drill,Deep,BreakChip"
+   PARAM ude_siemens_cycle_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_o_dtd_mode
+   {
+      TYPE o
+      DEFVAL "Off"
+      OPTIONS "Off","On","Seconds","Revolutions"
+      UI_LABEL "Final Dwell"
+   }
+   PARAM siemens_cycle_o_dtd
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Final Dwell Value"
+   }
+   PARAM siemens_cycle_frf
+   {
+      TYPE d
+      DEFVAL "1"
+      UI_LABEL "Feed Rate Factor"
+   }
+   PARAM siemens_cycle_o_vrt
+   {
+      TYPE d
+      DEFVAL "0.0"
+      TOGGLE Off
+      UI_LABEL "Step Retract Value"
+   }
+   PARAM ude_siemens_cycle_group_end
+   {
+      TYPE g
+      DEFVAL "END"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM siemens_drill_breakchip_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle83_breakchip"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT Drill_Tap
+{
+   UI_LABEL "Drill,Tap"
+   PARAM legend_rigid_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Rigid Tap Legend"
+   }
+   PARAM siemens_rigid_tap_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle84"
+   }
+   PARAM legend_rigid_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM ude_siemens_other_group
+   {
+      TYPE g
+      DEFVAL "start_open"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_sdac
+   {
+      TYPE o
+      DEFVAL "CLW"
+      OPTIONS "CLW","CCLW","Off"
+      UI_LABEL "Spindle Direction After Cycle"
+   }
+   PARAM siemens_cycle_o_techno
+   {
+      TYPE i
+      DEFVAL "0"
+      TOGGLE Off
+      UI_LABEL "Technological Setting"
+   }
+   PARAM ude_siemens_other_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Tap_Breakchip
+{
+   UI_LABEL "Drill,Tap,Breakchip"
+   PARAM ude_siemens_rigid_group
+   {
+      TYPE g
+      DEFVAL "START_OPEN"
+      UI_LABEL "Rigid Tap Parameters"
+   }
+   PARAM cycle_step_clearance
+   {
+      TYPE d
+      DEFVAL "0.5"
+      UI_LABEL "Step Clearance"
+   }
+   PARAM ude_siemens_rigid_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM legend_rigid_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Rigid Tap Legend"
+   }
+   PARAM siemens_rigid_tap_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle84"
+   }
+   PARAM legend_rigid_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM ude_siemens_other_group
+   {
+      TYPE g
+      DEFVAL "start_open"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_sdac
+   {
+      TYPE o
+      DEFVAL "CLW"
+      OPTIONS "CLW","CCLW","Off"
+      UI_LABEL "Spindle Direction After Cycle"
+   }
+   PARAM siemens_cycle_o_techno
+   {
+      TYPE i
+      DEFVAL "0"
+      TOGGLE Off
+      UI_LABEL "Technological Setting"
+   }
+   PARAM ude_siemens_other_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Tap_Deep
+{
+   UI_LABEL "Drill,Tap,Deep"
+   PARAM legend_rigid_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Rigid Tap Legend"
+   }
+   PARAM siemens_rigid_tap_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle84"
+   }
+   PARAM legend_rigid_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM ude_siemens_other_group
+   {
+      TYPE g
+      DEFVAL "start_open"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_sdac
+   {
+      TYPE o
+      DEFVAL "CLW"
+      OPTIONS "CLW","CCLW","Off"
+      UI_LABEL "Spindle Direction After Cycle"
+   }
+   PARAM siemens_cycle_o_techno
+   {
+      TYPE i
+      DEFVAL "0"
+      TOGGLE Off
+      UI_LABEL "Technological Setting"
+   }
+   PARAM ude_siemens_other_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+
+EVENT Drill_Tap_Float
+{
+   UI_LABEL "Drill,Tap,Float"
+
+  PARAM ude_siemens_float_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Float Tap Parameters"
+   }
+   PARAM siemens_cycle_enc
+   {
+      TYPE o
+      DEFVAL "Use Encoder-Dwell Off"
+      OPTIONS "Use Encoder-Dwell Off","Use Encoder-Dwell On","No Encoder-Feed Rate before Cycle","No Encoder-Feed Rate in Cycle"
+      UI_LABEL "Encoder"
+   }
+   PARAM ude_siemens_float_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM legend_float_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Float Tap Legend"
+   }
+   PARAM siemens_float_tap_map
+   {
+      TYPE l
+      DEFVAL "sinumerik_828d_cycle840"
+   }
+   PARAM legend_float_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM ude_siemens_other_group
+   {
+      TYPE g
+      DEFVAL "start_open"
+      UI_LABEL "Other Parameters"
+   }
+   PARAM siemens_cycle_sdac
+   {
+      TYPE o
+      DEFVAL "CLW"
+      OPTIONS "CLW","CCLW","Off"
+      UI_LABEL "Spindle Direction After Cycle"
+   }
+   PARAM siemens_cycle_o_techno
+   {
+      TYPE i
+      DEFVAL "0"
+      TOGGLE Off
+      UI_LABEL "Technological Setting"
+   }
+   PARAM ude_siemens_other_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}

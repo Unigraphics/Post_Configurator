@@ -1,0 +1,23 @@
+Ook!>
+Testname=Bla
+PB-Postpui=H:\VS_Projects\PB2PC\Entrypoint\bin\Debug\Autotest\sinumerik\sim08_mill_5ax_sinumerik_mm.pui
+Controller=Sinumerik 840D
+Kinematic=1
+UDE=0
+Outputfolder=H:\PB2PC_Autotest\
+Create_subfolder=0
+SingleStepTest=false
+LogfileLocation=H:\LogfilePB2PC\
+Ook!<
+
+Ook!>
+Testname=Blubb
+PB-Postpui=H:\VS_Projects\PB2PC\Entrypoint\bin\Debug\Autotest\sinumerik\sim08_mill_5ax_sinumerik_mm.pui
+Controller=Sinumerik 840D
+Kinematic=1
+UDE=0
+Outputfolder=H:\PB2PC_Autotest\
+Create_subfolder=1
+SingleStepTest=false
+LogfileLocation=H:\LogfilePB2PC\
+Ook!<

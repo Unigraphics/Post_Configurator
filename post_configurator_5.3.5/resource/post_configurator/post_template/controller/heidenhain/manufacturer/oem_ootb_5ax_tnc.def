@@ -1,0 +1,94 @@
+MACHINE HEIDENHAIN_ITNC
+
+FORMATTING
+{
+  SEQUENCE sequence_number 1 1 1 99999
+
+  ADDRESS home_position_x 
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(home_x_var)=]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS home_position_y 
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(home_y_var)=]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS home_position_z 
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(home_z_var)=]
+      ZERO_FORMAT Zero_real
+  }
+
+  BLOCK_TEMPLATE output_homeposition_X 
+  {
+       Text[FN 0:]
+       home_position_x[$mom_sys_home_pos(0)]
+       Text[; X HOME POSITION]
+  }
+
+  BLOCK_TEMPLATE output_homeposition_Y 
+  {
+       Text[FN 0:]
+       home_position_y[$mom_sys_home_pos(1)]
+       Text[; Y HOME POSITION]
+  }
+
+  BLOCK_TEMPLATE output_homeposition_Z 
+  {
+       Text[FN 0:]
+       home_position_z[$mom_sys_home_pos(2)]
+       Text[; Z HOME POSITION]
+  }
+
+  BLOCK_TEMPLATE return_home_z 
+  {
+       G_motion[$mom_sys_rapid_code]
+       Text[Z$mom_sys_leader(home_z_var)]
+       Text[R0]
+       FMAX[ ]\nows
+       M[91]
+  }
+
+  BLOCK_TEMPLATE return_home_xy 
+  {
+       G_motion[$mom_sys_rapid_code]
+       Text[X$mom_sys_leader(home_x_var) Y$mom_sys_leader(home_y_var)]
+       Text[R0]
+       FMAX[ ]\nows
+       M[91]
+  }
+  
+  BLOCK_TEMPLATE return_M140 
+  {
+       Text[M140 MB MAX]
+  }
+  
+  BLOCK_TEMPLATE tool_change_zero 
+  {
+       Text[TOOL CALL]
+       T[0]
+  }
+  
+  BLOCK_TEMPLATE spindle_on 
+  {
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_coolant[$mom_sys_coolant_code(ON)]
+  }
+  
+  BLOCK_TEMPLATE output_m128 
+  {
+       Text[L]
+       M[128]
+       F[$dpp_TNC_m128_feed_value]
+  }
+}
+

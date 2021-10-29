@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+#===============================================================================
+#
+#          Copyright 2019 Siemens Product Lifecycle Management Software Inc.
+#                            All Rights Reserved.
+#
+#===============================================================================
+-->
+<DATA>
+  <Version>3.0</Version>
+  <Library_Version>5.3.5</Library_Version>
+    <UI_Item>
+        <Name>Controller</Name>
+        <Level>
+            <Name>Sinumerik ONE</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/base/ctrl_sinumerik_one_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/service/template_service_sinumerik_one.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Sinumerik 840D</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/base/ctrl_s840d_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/service/template_service_s840d.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Sinumerik 828D</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/base/ctrl_s828d_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/service/template_service_s828d.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Fanuc</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/fanuc/base/ctrl_fanuc_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/fanuc/service/template_service_fanuc.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Heidenhain iTNC 530</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/base/ctrl_itnc530_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/service/template_service_itnc530.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Heidenhain TNC 640</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/base/ctrl_tnc640_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/service/template_service_tnc640.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Mill</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/base/ctrl_okuma_osp_base_m.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/service/template_service_okuma_osp.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Turning</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/base/ctrl_okuma_osp_base_l.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/service/template_service_okuma_osp.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Multifunction</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/base/ctrl_okuma_osp_base_s.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/service/template_service_okuma_osp.psl</Service_Layer>
+        </Level>
+        <Level>
+            <Name>Controller Template</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/template/base/ctrl_template_base.psl</Layer>
+            <Service_Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/template/service/template_service_template.psl</Service_Layer>
+        </Level>
+    </UI_Item>
+    <UI_Item>
+        <Name>Manufacturer</Name>
+        <Level>
+            <Name>Sinumerik OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/manufacturer/oem_ootb_5ax_sinumerik.psl</Layer>
+            <Dependency>Sinumerik ONE</Dependency>
+            <Dependency>Sinumerik 840D</Dependency>
+        </Level>
+        <Level>
+            <Name>Fanuc OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/fanuc/manufacturer/oem_ootb_5ax_fanuc.psl</Layer>
+            <Dependency>Fanuc</Dependency>
+        </Level>
+        <Level>
+            <Name>Heidenhain iTNC OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/manufacturer/oem_ootb_5ax_tnc.psl</Layer>
+            <Dependency>Heidenhain iTNC 530</Dependency>
+        </Level>
+        <Level>
+            <Name>Heidenhain TNC OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/manufacturer/oem_ootb_5ax_tnc.psl</Layer>
+            <Dependency>Heidenhain TNC 640</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Mill OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/manufacturer/oem_ootb_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Mill</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Turning OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/manufacturer/oem_ootb_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Turning</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Multifunction OOTB</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/manufacturer/oem_ootb_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Multifunction</Dependency>
+        </Level>
+    </UI_Item>
+    <UI_Item>
+        <Name>Machine</Name>
+        <Level>
+            <Name>Sinumerik Sample Machine Level</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/machine/machine_ootb_5ax_sinumerik.psl</Layer>
+            <Dependency>Sinumerik ONE</Dependency>
+            <Dependency>Sinumerik 840D</Dependency>
+            <Dependency>Sinumerik 828D</Dependency>
+        </Level>
+        <Level>
+            <Name>Sinumerik Sample Turning Machine</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/sinumerik/machine/machine_ootb_turn_sinumerik.psl</Layer>
+            <Dependency>Sinumerik ONE</Dependency>
+            <Dependency>Sinumerik 840D</Dependency>
+        </Level>
+        <Level>
+            <Name>Fanuc Sample Machine Level</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/fanuc/machine/machine_ootb_5ax_fanuc.psl</Layer>
+            <Dependency>Fanuc</Dependency>
+        </Level>
+        <Level>
+            <Name>Heidenhain iTNC Sample Machine Level</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/machine/machine_ootb_5ax_itnc.psl</Layer>
+            <Dependency>Heidenhain iTNC 530</Dependency>
+        </Level>
+        <Level>
+            <Name>Heidenhain TNC Sample Machine Level</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/heidenhain/machine/machine_ootb_5ax_itnc.psl</Layer>
+            <Dependency>Heidenhain TNC 640</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma Sample Milling Machine</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/machine/machine_ootb_mill_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Mill</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Turning</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/machine/machine_ootb_turn_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Turning</Dependency>
+        </Level>
+        <Level>
+            <Name>Okuma OSP Multifunction</Name>
+            <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/controller/okuma/machine/machine_ootb_millturn_okuma_osp.psl</Layer>
+            <Dependency>Okuma OSP Multifunction</Dependency>
+        </Level>
+    </UI_Item>
+    <LIB>
+        <Layer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/libraries/libraries.psl</Layer>
+        <BinPath>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/bin/</BinPath>
+        <SourcePath>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/template/</SourcePath>
+        <CustomLayer>${UGII_CAM_RESOURCE_DIR}post_configurator/post_template/template/template_custom.psl</CustomLayer>
+    </LIB>
+</DATA>

@@ -1,0 +1,149 @@
+#############################################################################################
+#
+#   Additive Layer
+#
+#############################################################################################
+#
+#   Copyright 2020 Siemens Digital Industries Software
+#               All Rights Reserved.
+#
+#############################################################################################
+# Description
+# Generic additive layer for reuse controller independent. To reuse import the layer in
+# an existing post processor by the Layer Import option from Post Configurator.
+#############################################################################################
+# History
+#
+#
+#
+#############################################################################################
+#
+
+MACHINE Default
+
+EVENT wire_arc_header
+{
+   UI_LABEL "Wire Arc Header"
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive","User Defined"
+      UI_LABEL "Status"
+   }
+   PARAM waam_monitoring_number
+   {
+      TYPE i
+      DEFVAL "1"
+      UI_LABEL "Monitoring Number"
+   }
+   PARAM waam_output
+   {
+      TYPE o
+      DEFVAL "Program"
+      OPTIONS "Program","Operation","Level"
+      UI_LABEL "WAAM Output"
+   }
+}
+
+EVENT wire_parameters
+{
+   UI_LABEL "Wire Arc Operation Parameters"
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive","User Defined"
+      UI_LABEL "Status"
+   }
+   PARAM job_number_main
+   {
+      TYPE i
+      DEFVAL "10"
+      UI_LABEL "Job Number Main"
+   }
+   PARAM job_number_stepover
+   {
+      TYPE i
+      DEFVAL "10"
+      UI_LABEL "Job Number Stepover"
+   }
+   PARAM job_number_finish
+   {
+      TYPE i
+      DEFVAL "10"
+      UI_LABEL "Job Number Finish"
+   }
+}
+
+EVENT laser_parameters
+{
+   UI_LABEL "DED Laser Parameters"
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive","User Defined"
+      UI_LABEL "Status"
+   }
+   PARAM DED_power
+   {
+      TYPE i
+      DEFVAL "1000"
+      UI_LABEL "Power"
+   }
+   PARAM DED_powder
+   {
+      TYPE i
+      DEFVAL "100"
+      UI_LABEL "Powder"
+   }
+   PARAM DED_carriergas
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Carrier Gas"
+   }
+   PARAM DED_shieldgas
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Shield Gas"
+   }
+   PARAM DED_stirrer
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "Stirrer"
+   }
+   PARAM DED_id
+   {
+      TYPE i
+      DEFVAL "0"
+      UI_LABEL "ID"
+   }
+}
+
+EVENT additive_speed_modulation
+{
+   UI_LABEL "Additive speed modulation"
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive","User Defined"
+      UI_LABEL "Status"
+   }
+   PARAM filament_diameter
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Filament Diameter"
+   }
+   PARAM material_flow_value
+   {
+      TYPE d
+      DEFVAL "0.0"
+      UI_LABEL "Material Flow Value"
+   }
+}

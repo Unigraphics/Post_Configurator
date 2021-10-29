@@ -1,0 +1,38 @@
+#############################################################################################
+#
+#   Parallel Axis Setting Layer
+#
+############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+#=============================================================================================
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 15-Jul-2020  HZ                    Add version history
+# $HISTORY$ 
+#############################################################################################
+
+
+MACHINE Default
+
+FORMATTING
+{
+
+	ADDRESS QUILL_AXIS
+	{
+		FORMAT 		AbsCoord
+		FORCE  		off
+		LEADER 		[$mom_sys_leader(QUILL)]
+		ZERO_FORMAT Zero_real
+	}
+	
+	BLOCK_TEMPLATE quill_axis_move
+	{
+		G_motion[$mom_sys_rapid_code]
+		QUILL_AXIS[$mom_quill_axis_position]
+	}
+
+}

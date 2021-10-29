@@ -1,0 +1,40 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+
+MACHINE GENERIC
+EVENT prefer_solution
+{
+	UI_LABEL "Preferred Solution"
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive","User Defined"
+      UI_LABEL "Status"
+   }
+	PARAM prefer_axis
+	{
+		TYPE o
+		DEFVAL "OFF"
+		OPTIONS "OFF", "A", "B", "C"
+		UI_LABEL "Preferred Axis"
+	}
+	PARAM prefer_output_min
+	{
+		TYPE d
+		DEFVAL "0.000000"
+		TOGGLE Off
+		UI_LABEL "Preferred Range Minimum"
+	}
+	PARAM prefer_output_max
+	{
+		TYPE d
+		DEFVAL "0.000000"
+		TOGGLE Off
+		UI_LABEL "Preferred Range Maximum"
+	}
+}

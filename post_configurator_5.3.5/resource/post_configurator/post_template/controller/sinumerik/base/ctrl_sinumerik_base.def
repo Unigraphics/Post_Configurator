@@ -1,0 +1,3118 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#=============================================================================================
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 21-May-2020  HZ       		     Added version history
+# 28-May-2020  XY                  Changed BLOCK_TEMPLATE external_subprogram
+# 03-Jul-2020  LL                  Add prepos_transmit
+# 04-Aug-2020  LL                  Remove lathe_roughing
+# 20-Aug-2020  HZ					Define G_plane of circular_move by arc plane
+# $HISTORY$
+#############################################################################################
+
+MACHINE SINUMERIK
+
+FORMATTING
+{
+  WORD_SEPARATOR " "
+  END_OF_LINE ""
+  SEQUENCE sequence_number 10  2 1 99999999
+
+################ FORMAT DECLARATIONS #################
+  FORMAT AbsCoord "&__5.3_"
+  FORMAT AbsCoord_IN "&__5.4_"
+  FORMAT AbsCoord_nurbs "&__5.6_"
+  FORMAT Coordinate "&_01.3_"
+  FORMAT Coordinate_IN "&_01.4_"
+  FORMAT Coordinate_7 "&__5.7_"
+  FORMAT Digit_1 "&__1_00"
+  FORMAT Digit_2 "&__2_00"
+  FORMAT Digit_3 "&__3_00"
+  FORMAT Digit_4 "&__4_00"
+  FORMAT Digit_5 "&__5_00"
+  FORMAT Digit_8 "&__8_00"
+  FORMAT Dwell_SECONDS "&__5.3_"
+  FORMAT Feed "&__7.2_"
+  FORMAT Feed_DPM "&__5.2_"
+  FORMAT Feed_FRN "&__5.3_"
+  FORMAT Feed_INV "&__5.3_"
+  FORMAT Feed_IPM "&__4.1_"
+  FORMAT Feed_IPR "&__1.4_"
+  FORMAT Feed_MMPM "&__5.0_"
+  FORMAT Feed_MMPR "&__2.3_"
+  FORMAT Hcode "&_02_00"
+  FORMAT Rev "&__4_00"
+  FORMAT Rotary "&__4.5_"
+  FORMAT Tcode "&_02_00"
+  FORMAT Vector "&__5.6_"
+  FORMAT Zero_int "&_01_0_"
+  FORMAT Zero_real "&_01.10"
+  FORMAT Zero_command "&_01_0_"
+  FORMAT Digit_command "&__2_00"
+  FORMAT String "%s"
+  FORMAT String_Cycle "%s"
+  FORMAT Digit_Cycle "&_01.9_"
+  FORMAT String_Zero "&_01.10"
+
+################ ADDRESS DECLARATIONS ################
+  ADDRESS header_program
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "%_N_"
+      TRAILER     "_MPF"
+  }
+
+  ADDRESS header_subprogram
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "%_N_"
+      TRAILER     "_SPF"
+  }
+
+  ADDRESS G_cutcom
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_zero
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_zero_non_modal
+  {
+      FORMAT      Digit_command
+      FORCE       always
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_plane
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_unit
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS G_feed
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_spin
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_offset
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      MAX         599 Truncate
+      MIN         54 Truncate
+      LEADER      "G"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS G_motion
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS cycle_parentheses_l
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "("
+  }
+
+  ADDRESS G_mode
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_smooth
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS G
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      MAX         999 Truncate
+      MIN         0 Truncate
+      LEADER      [$mom_sys_leader(G)]
+      TRAILER     [$mom_sys_trailer(G)]
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS F_control
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      "F"
+  }
+
+  ADDRESS SD
+  {
+      FORMAT      Digit_1
+      FORCE       off
+      LEADER      "BSPLINE SD="
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS X
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(X)]
+      TRAILER     [$mom_sys_trailer(X)]
+  }
+
+  ADDRESS X_home
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      LEADER      "X"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Y
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(Y)]
+      TRAILER     [$mom_sys_trailer(Y)]
+  }
+
+  ADDRESS Y_home
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      LEADER      "Y"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Z
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(Z)]
+      TRAILER     [$mom_sys_trailer(Z)]
+  }
+
+  ADDRESS Z_home
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      LEADER      "Z"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS fourth_axis
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(fourth_axis)]
+      TRAILER     [$mom_sys_trailer(fourth_axis)]
+  }
+
+  ADDRESS fourth_axis_home
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      [$lib_sys_home_leader(3)=]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS fifth_axis
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(fifth_axis)]
+      TRAILER     [$mom_sys_trailer(fifth_axis)]
+  }
+
+  ADDRESS fifth_axis_home
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      [$lib_sys_home_leader(4)=]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS X_vector
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "A3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Y_vector
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "B3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Z_vector
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "C3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS I
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "I"
+  }
+
+  ADDRESS J
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "J"
+  }
+
+  ADDRESS K
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "K"
+  }
+
+  ADDRESS helix_turn
+  {
+      FORMAT      Digit_3
+      FORCE       always
+      LEADER      "TURN="
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS R
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "CR="
+  }
+
+  ADDRESS S
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "S"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS T
+  {
+      FORMAT      Zero_int
+      FORCE       always
+      MAX         999999 Truncate
+      MIN         0 Truncate
+      LEADER      "T"
+  }
+
+  ADDRESS T_name
+  {
+      FORMAT      String
+      FORCE       off
+      MAX         99 Truncate
+      MIN         0 Truncate
+      LEADER      "T"
+  }
+
+  ADDRESS D
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      MAX         99 Truncate
+      MIN         0 Truncate
+      LEADER      "D"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS dwell
+  {
+      FORMAT      Dwell_SECONDS
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         0.000 Truncate
+      LEADER      "F"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS dwell_rev
+  {
+      FORMAT      Rev
+      FORCE       always
+      LEADER      "S"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M_spindle
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      [$mom_sys_leader(M_spindle)]
+      TRAILER     [$mom_sys_trailer(M_spindle)]
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS M_range
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS M_coolant
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS M_clamp_fourth
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS M_clamp_fifth
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS M
+  {
+      FORMAT      Digit_command
+      FORCE       always
+      LEADER      [$::mom_sys_leader(M)]
+      TRAILER     [$::mom_sys_trailer(M)]
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS CALL
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "EXTCALL("
+      TRAILER     ")"
+  }
+
+  ADDRESS PL
+  {
+      FORMAT      AbsCoord_nurbs
+      FORCE       off
+      MIN         0 Truncate
+      LEADER      "PL="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS F
+  {
+      FORMAT      Feed
+      FORCE       off
+      MAX         999999.9999 Truncate
+      MIN         0.0001 Truncate
+      LEADER      "F"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS transf
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS polyX
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      "PO[X]=("
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff1
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff2
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      TRAILER     ")"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS polyY
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      "PO[Y]=("
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff3
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff4
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      TRAILER     ")"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS polyZ
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      "PO[Z]=("
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff5
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS coeff6
+  {
+      FORMAT      Coordinate_7
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      ","
+      TRAILER     ")"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS cycle_parentheses_r
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ")"
+  }
+
+  ADDRESS G_adjust
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_return
+  {
+      FORMAT      Digit_command
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS E
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "E"
+  }
+
+  ADDRESS rot_x
+  {
+      FORMAT      Rotary
+      FORCE       always
+      LEADER      "AROT X"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS rot_y
+  {
+      FORMAT      Rotary
+      FORCE       always
+      LEADER      "AROT Y"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS rot_z
+  {
+      FORMAT      Rotary
+      FORCE       always
+      LEADER      "AROT Z"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS N
+  {
+      FORMAT      Digit_8
+      FORCE       off
+      MAX         99999999 Truncate
+      LEADER      [$mom_sys_leader(N)]
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS Text
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS A3
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "A3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS B3
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "B3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS C3
+  {
+      FORMAT      Vector
+      FORCE       always
+      LEADER      "C3="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS A5
+  {
+      FORMAT      Vector
+      FORCE       off
+      LEADER      "A5="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS B5
+  {
+      FORMAT      Vector
+      FORCE       off
+      LEADER      "B5="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS C5
+  {
+      FORMAT      Vector
+      FORCE       off
+      LEADER      "C5="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS prog_dia
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      ""
+  }
+
+  ADDRESS S_max
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "LIMS="
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS S_pos
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      [$mom_sys_leader(SPOS)]
+      TRAILER     [$mom_sys_trailer(SPOS)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS S_preset
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "S"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS G_dwell
+  {
+      FORMAT      Digit_command
+      FORCE       always
+      LEADER      "G"
+      ZERO_FORMAT Zero_command
+  }
+
+  ADDRESS G_stopping
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS S_master
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "SETMS("
+      TRAILER     ")"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS X_AXIS
+  {
+  	FORMAT AbsCoord
+  	FORCE off
+  	LEADER "X"
+  	ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Y_AXIS
+  {
+  	FORMAT AbsCoord
+  	FORCE off
+  	LEADER "Y"
+  	ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Z_AXIS
+  {
+  	FORMAT AbsCoord
+  	FORCE off
+  	LEADER "Z"
+  	ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS A_AXIS
+  {
+  	FORMAT Rotary
+  	FORCE off
+  	LEADER "A"
+  	ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS B_AXIS
+  {
+  	FORMAT Rotary
+  	FORCE off
+  	LEADER "B"
+  	ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS C_AXIS
+  {
+  	FORMAT Rotary
+  	FORCE off
+  	LEADER "C"
+  	ZERO_FORMAT Zero_real
+  }
+
+################ ADDRESS DECLARATIONS ################
+  ADDRESS LF_AAXIS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_ENUM
+  {
+      FORMAT      Digit_5
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS LF_BAXIS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_XABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_FEED
+  {
+      FORMAT      Feed
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_YABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_SPEED
+  {
+      FORMAT      Rev
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS LF_ZABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+################ CYCLE ADDRESS DECLARATIONS ################
+
+  ADDRESS cycle_call
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_comment
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_seperator
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_start_character
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_end_character
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_description
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_text_first
+  {
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT String_Zero
+  }
+
+  ADDRESS cycle_text
+  {
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      ","
+      ZERO_FORMAT String_Zero
+  }
+
+  # This type must be used when a calculation is to take place
+  ADDRESS cycle_digit
+  {
+      FORMAT      Digit_Cycle
+      FORCE       always
+      LEADER      ","
+      ZERO_FORMAT String_Zero
+  }
+
+  ADDRESS cycle_digit_first
+  {
+  	  FORMAT Digit_Cycle
+  	  FORCE always
+  	  LEADER ""
+      ZERO_FORMAT String_Zero
+  }
+
+############ BLOCK TEMPLATE DECLARATIONS #############
+  BLOCK_TEMPLATE POCKET4
+  {
+    cycle_call[POCKET4]\nows
+    cycle_start_character[(]\nows
+  	cycle_digit_first[\$lib_parameter(pocket4,_RTP)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_RFP)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_SDIS)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_DP)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_PRAD)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_PA)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_PO)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_MID)]\nows
+  	cycle_text[\$lib_parameter(pocket4,_FAL)]\nows
+  	cycle_text[\$lib_parameter(pocket4,_FALD)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_FFP1)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_FFD)]\nows
+  	cycle_text[\$lib_parameter(pocket4,_CDIR)]\nows
+  	cycle_text[\$lib_parameter(pocket4,_VARI)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_MIDA)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_AP1)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_AD)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_RAD1)]\nows
+  	cycle_digit[\$lib_parameter(pocket4,_DP1)]\nows
+  	cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE header_program
+  {
+       header_program[$lib_nc_header_name]
+  }
+
+  BLOCK_TEMPLATE header_subprogram
+  {
+       header_subprogram[$lib_spf(value,subprogram_output_name)]
+  }
+
+  BLOCK_TEMPLATE absolute_mode
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+       G_plane[$mom_sys_cutcom_plane_code(XY)]\opt
+       G_unit[$mom_sys_unit_code($mom_output_unit)]\opt
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+  }
+
+  BLOCK_TEMPLATE auxfun
+  {
+       M[$mom_auxfun]
+  }
+
+  BLOCK_TEMPLATE bore_back_offset
+  {
+       G_mode[$mom_sys_output_code(INCREMENTAL)]
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_siemens_cycle_rpa]\opt
+       Y[$mom_siemens_cycle_rpo]\opt
+       Z[$mom_siemens_cycle_rpap]\opt
+  }
+
+  BLOCK_TEMPLATE channel_init
+  {
+       G_cutcom[40]
+       G_zero[99]
+       G_plane[99]
+       G_feed[0]
+       G_spin[99]
+       G_motion[99]
+       G_mode[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+       fourth_axis[9999.999]
+       fifth_axis[9999.999]
+       I[99999.999]
+       J[99999.999]
+       K[99999.999]
+       R[99999.999]
+       D[99]
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+       M_coolant[$mom_sys_coolant_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE circular_move
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_pos_arc_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]
+       J[$mom_pos_arc_center(1) - $mom_prev_pos(1)]
+       K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]
+       R[$mom_arc_radius]
+       helix_turn[$mom_helix_turn_number]\opt
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE circular_move_turbo
+  {
+       G_cutcom[^sys_cutcom_code(CUTCOM_STATUS)]\opt
+       G_plane[^sys_cutcom_plane_code(ARC_PLANE)]\opt
+       G_feed[^sys_feed_rate_mode_code(FEED_MODE)]\opt
+       G_motion[^sys_circle_code(ARC_DIRECTION)]\opt
+       G_mode[^sys_output_code(OUTPUT_MODE)]
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       I[^CENTERX]
+       J[^CENTERY]
+       K[^CENTERZ]
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+       M_coolant[^sys_coolant_code(COOLNT_STATUS)]\opt
+       F[^FEED]
+  }
+
+  BLOCK_TEMPLATE circular_move_turn
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_pos_arc_plane)]\opt
+       G_spin[$mom_sys_spindle_mode_code($spindle_mode)]\opt
+       G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]
+       K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]
+       R[$mom_arc_radius]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE circular_move_cycle95
+  {
+       G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]\opt
+       K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]\opt
+  }
+
+  BLOCK_TEMPLATE clamp_fifth_axis
+  {
+       M_clamp_fifth[$mom_sys_clamp_code_fifth]
+  }
+
+  BLOCK_TEMPLATE clamp_fourth_axis
+  {
+       M_clamp_fourth[$mom_sys_clamp_code_fourth]
+  }
+
+  BLOCK_TEMPLATE coolant_off
+  {
+       M_coolant[$mom_sys_coolant_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE coolant_on
+  {
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]
+  }
+
+  BLOCK_TEMPLATE coordinate_system
+  {
+       G[$mom_sys_reset_code]
+  }
+
+  BLOCK_TEMPLATE cutcom_off
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE cycle_feed_mode
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($mom_cycle_feed_rate_mode)]
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE cycle_init
+  {
+       G_motion[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+  }
+
+  BLOCK_TEMPLATE cycle_move
+  {
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       X[$mom_cycle_rapid_to_pos(0)*$x_factor]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Z[$mom_cycle_rapid_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       D[$mom_tool_adjust_register]\opt
+       F[$feed]
+  }
+  BLOCK_TEMPLATE cycle_feed_to
+  {
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+       G_motion[$mom_sys_linear_code]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE cycle_off
+  {
+       G_motion[$mom_sys_cycle_off]
+  }
+
+  BLOCK_TEMPLATE cycle_retract
+  {
+       X[$mom_cycle_retract_to_pos(0)*$x_factor]
+       Y[$mom_cycle_retract_to_pos(1)]
+       Z[$mom_cycle_retract_to_pos(2)]
+  }
+
+  BLOCK_TEMPLATE cycle_rotation
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)]\opt
+       fifth_axis[$mom_out_angle_pos(1)]\opt
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+  }
+
+  BLOCK_TEMPLATE delay
+  {
+       G_dwell[$mom_sys_delay_code($mom_delay_mode)]
+       dwell[$mom_delay_value]
+  }
+
+  BLOCK_TEMPLATE delay_rev
+  {
+       G_dwell[$mom_sys_delay_code($mom_delay_mode)]
+       dwell_rev[$mom_delay_revs]
+  }
+
+  BLOCK_TEMPLATE end_of_subprogram
+  {
+       M[$mom_sys_end_of_subprogram]
+  }
+
+  BLOCK_TEMPLATE end_of_path
+  {
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+       M_coolant[$mom_sys_coolant_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE end_of_program
+  {
+       M[$mom_sys_end_of_program_code]
+  }
+
+  BLOCK_TEMPLATE external_subprogram
+  {
+       CALL[\"$lib_spf(value,subprogram_output_file_basename)\"]
+  }
+
+  BLOCK_TEMPLATE fifth_axis_rotate_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       fifth_axis[$mom_out_angle_pos(1)]
+  }
+
+  BLOCK_TEMPLATE first_tool_1
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+       G_plane[$mom_sys_cutcom_plane_code(XY)]
+       G_motion[$mom_sys_rapid_code]
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+  }
+
+  BLOCK_TEMPLATE fixture_offset
+  {
+       G_offset[$mom_siemens_fixture_offset_value]\opt
+  }
+
+  BLOCK_TEMPLATE fixture_offset_1
+  {
+       G_offset[$mom_fixture_offset_value + 53 + 447*($mom_fixture_offset_value>4)]
+  }
+
+  BLOCK_TEMPLATE fourth_axis_rotate_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+  }
+
+  BLOCK_TEMPLATE frame_arot_x
+  {
+       rot_x[\$lib_coord_ang_A]\opt
+  }
+
+  BLOCK_TEMPLATE frame_arot_y
+  {
+       rot_y[\$lib_coord_ang_B]\opt
+  }
+
+  BLOCK_TEMPLATE frame_arot_z
+  {
+       rot_z[\$lib_coord_ang_C]\opt
+  }
+
+  BLOCK_TEMPLATE frame_trans
+  {
+       Text[TRANS]
+       X[$mom_origin(0)]
+       Y[$mom_origin(1)]
+       Z[$mom_origin(2)]
+  }
+
+  BLOCK_TEMPLATE from
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_from_pos(0)*$x_factor]
+       Y[$mom_from_pos(1)]
+       Z[$mom_from_pos(2)]
+  }
+
+  BLOCK_TEMPLATE home_position
+  {
+       X_home[$mom_sys_home_pos(0)]
+       Y_home[$mom_sys_home_pos(1)]
+       Z_home[$mom_sys_home_pos(2)]
+  }
+
+  BLOCK_TEMPLATE home_position_rotary
+  {
+       fourth_axis_home[$lib_sys_home_param(3)]\opt
+       fifth_axis_home[$lib_sys_home_param(4)]\opt
+  }
+
+  BLOCK_TEMPLATE incremental_mode
+  {
+       G_mode[$mom_sys_output_code(INCREMENTAL)]
+  }
+
+  BLOCK_TEMPLATE linear_move
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_linear_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+       A5[$mom_contact_normal(0)]\opt
+       B5[$mom_contact_normal(1)]\opt
+       C5[$mom_contact_normal(2)]\opt
+       S[$mom_spindle_rpm]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE linear_move_sim
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_linear_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_mcs_goto(0)]
+       Y[$mom_mcs_goto(1)]
+       Z[$mom_mcs_goto(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+       S[$mom_spindle_rpm]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE linear_move_turbo
+  {
+       G_cutcom[^sys_cutcom_code(CUTCOM_STATUS)]\opt
+       G_plane[^sys_cutcom_plane_code(CUTCOM_PLANE)]\opt
+       G_feed[^sys_feed_rate_mode_code(FEED_MODE)]\opt
+       G_motion[^sys_linear_code]
+       G_mode[^sys_output_code(OUTPUT_MODE)]
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       X_vector[^tool_axis0]\opt
+       Y_vector[^tool_axis1]\opt
+       Z_vector[^tool_axis2]\opt
+       fourth_axis[^POS4]
+       fifth_axis[^POS5]
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+       M_coolant[^sys_coolant_code(COOLNT_STATUS)]\opt
+       F[^FEED]
+  }
+
+  BLOCK_TEMPLATE linear_move_turn
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_spin[$mom_sys_spindle_mode_code($spindle_mode)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_motion[$mom_sys_linear_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE linear_move_cycle95
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+  }
+
+  BLOCK_TEMPLATE main_zero
+  {
+       G_zero[$lib_main_zero_register]
+  }
+
+  BLOCK_TEMPLATE manual_tool_change
+  {
+       M[$mom_sys_program_stop_code]
+  }
+
+  BLOCK_TEMPLATE mill_machine_mode_init
+  {
+       G_plane[$mom_sys_cutcom_plane_code(XY)]
+  }
+
+  BLOCK_TEMPLATE msg_method
+  {
+       Text[MSG(\"$mom_oper_method\")]\opt
+  }
+
+  BLOCK_TEMPLATE nurbs_bspline
+  {
+       SD[$mom_nurbs_order-1]
+       X[$mom_nurbs_points($nurbs_cntrl_count,0)]\opt
+       Y[$mom_nurbs_points($nurbs_cntrl_count,1)]\opt
+       Z[$mom_nurbs_points($nurbs_cntrl_count,2)]\opt
+       PL[$point_length]
+       F[$mom_sinumerik_feed]\opt
+  }
+
+  BLOCK_TEMPLATE nurbs_bspline_start
+  {
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_linear_code]
+       X[$mom_nurbs_points($nurbs_cntrl_count,0)]
+       Y[$mom_nurbs_points($nurbs_cntrl_count,1)]
+       Z[$mom_nurbs_points($nurbs_cntrl_count,2)]
+       F[$mom_sinumerik_feed]\opt
+  }
+
+  BLOCK_TEMPLATE nurbs_poly
+  {
+       F[$mom_feed_rate]\opt
+       polyX[$mom_nurbs_point_x]
+       coeff1[$mom_nurbs_co_efficient_0]
+       coeff2[$mom_nurbs_co_efficient_1]
+       polyY[$mom_nurbs_point_y]
+       coeff3[$mom_nurbs_co_efficient_3]
+       coeff4[$mom_nurbs_co_efficient_4]
+       polyZ[$mom_nurbs_point_z]
+       coeff5[$mom_nurbs_co_efficient_6]
+       coeff6[$mom_nurbs_co_efficient_7]
+  }
+
+  BLOCK_TEMPLATE opstop
+  {
+       M[$mom_sys_optional_stop_code]\opt\nows
+  }
+
+  BLOCK_TEMPLATE output_unit
+  {
+       G_unit[$mom_sys_unit_code($mom_output_unit)]
+  }
+
+  BLOCK_TEMPLATE prefun
+  {
+       G[$mom_prefun]
+  }
+
+  BLOCK_TEMPLATE polar_mode
+  {
+       Text[TRANSMIT(1)]
+  }
+
+  BLOCK_TEMPLATE prepos_transmit
+  {
+  	G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+  	G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+   	G_motion[$mom_sys_rapid_code]
+  	X[abs(sqrt(pow($mom_pos(0),2) + pow($mom_pos(1),2)) *$x_factor)]
+  	Y[0]
+  	Z[$mom_pos(2)]
+  	S[$mom_spindle_rpm]
+  	D[$mom_tool_adjust_register]
+  	M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  	M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE prog_dia_off
+  {
+       prog_dia["DIAMOF"]
+  }
+
+  BLOCK_TEMPLATE prog_dia_on
+  {
+       prog_dia["DIAMON"]
+  }
+
+  BLOCK_TEMPLATE rapid_move
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+       S[$mom_spindle_rpm]
+       D[$mom_tool_adjust_register]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_move_sim
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_mcs_goto(0)]
+       Y[$mom_mcs_goto(1)]
+       Z[$mom_mcs_goto(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+       S[$mom_spindle_rpm]
+       D[$mom_tool_adjust_register]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_move_turbo
+  {
+       G_plane[^sys_cutcom_plane_code(CUTCOM_PLANE)]\opt
+       G_motion[^sys_rapid_code]\opt
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       fourth_axis[^POS4]
+       fifth_axis[^POS5]
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_move_turn
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_spin[$mom_sys_spindle_mode_code($spindle_mode)]\opt
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_rotary
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)+ $mom_init_pos(3)]
+       fifth_axis[$mom_out_angle_pos(1)+ $mom_init_pos(4)]
+  }
+
+  BLOCK_TEMPLATE rapid_rotary_init_pos
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_init_pos(3) + $mom_out_angle_pos(0)]
+       fifth_axis[$mom_init_pos(4) + $mom_out_angle_pos(1)]
+  }
+
+  BLOCK_TEMPLATE rapid_spindle
+  {
+       G_motion[$mom_sys_rapid_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]\opt
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE return_home_4th
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis_home[$lib_sys_home_param(3)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_home_4th5th
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis_home[$lib_sys_home_param(3)]
+       fifth_axis_home[$lib_sys_home_param(4)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_home_5th
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       fifth_axis_home[$lib_sys_home_param(4)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_move_4th
+  {
+       G_zero_non_modal[$mom_sys_return_code]
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_sys_home_pos(3)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_move_4th5th
+  {
+       G_zero_non_modal[$mom_sys_return_code]
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_sys_home_pos(3)]
+       fifth_axis[$mom_sys_home_pos(4)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_move_5th
+  {
+       G_zero_non_modal[$mom_sys_return_code]
+       G_motion[$mom_sys_rapid_code]
+       fifth_axis[$mom_sys_home_pos(4)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE return_home_X
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(0)=$lib_sys_home_param(0)]
+  }
+
+  BLOCK_TEMPLATE return_home_XY
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(0)=$lib_sys_home_param(0)]
+       Text[$lib_sys_home_leader(1)=$lib_sys_home_param(1)]
+  }
+
+  BLOCK_TEMPLATE return_home_Y
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(1)=$lib_sys_home_param(1)]
+  }
+
+  BLOCK_TEMPLATE return_home_Z
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(2)=$lib_sys_home_param(2)]
+       D[0]\opt
+  }
+
+  BLOCK_TEMPLATE return_home_ZX
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(0)=$lib_sys_home_param(0)]
+       Text[$lib_sys_home_leader(2)=$lib_sys_home_param(2)]
+  }
+
+  BLOCK_TEMPLATE return_home_ZY
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(1)=$lib_sys_home_param(1)]
+       Text[$lib_sys_home_leader(2)=$lib_sys_home_param(2)]
+  }
+
+  BLOCK_TEMPLATE return_motion
+  {
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]\opt
+  }
+
+  BLOCK_TEMPLATE return_move
+  {
+       G_zero_non_modal[$mom_sys_return_code]
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_sys_home_pos(0)]
+       Y[$mom_sys_home_pos(1)]
+       Z[$mom_sys_home_pos(2)]
+       D[0]
+  }
+
+  BLOCK_TEMPLATE rewind_stop_code
+  {
+       Text[%]
+  }
+
+  BLOCK_TEMPLATE rotation_axes
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+  }
+
+  BLOCK_TEMPLATE rotation_vector
+  {
+       G_motion[$mom_sys_rapid_code]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+  }
+
+  BLOCK_TEMPLATE sequence_number
+  {
+       N[$mom_seqnum]
+  }
+
+  BLOCK_TEMPLATE sequence_number_turbo
+  {
+       N[^SEQNUM]
+  }
+
+  BLOCK_TEMPLATE set_cycle_feedrate
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE set_masterspindle
+  {
+	S_master[$mom_masterspindle]
+  }
+
+  BLOCK_TEMPLATE spindle_init
+  {
+       G_spin[99]
+       S[99999]
+       M_spindle[99]
+       M_range[99]
+       S_max[99999]
+       S_preset[99999]
+  }
+
+  BLOCK_TEMPLATE spindle_max_rpm
+  {
+       S_max[$mom_spindle_maximum_rpm]
+  }
+
+  BLOCK_TEMPLATE spindle_off
+  {
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE spindle_orient
+  {
+       M_spindle[$mom_sys_spindle_orient_code]
+  }
+
+  BLOCK_TEMPLATE spindle_orient2
+  {
+       S_pos[$mom_sys_spindle_orient_value]
+  }
+
+  BLOCK_TEMPLATE spindle_range
+  {
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE spindle_rpm
+  {
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE spindle_rpm_preset
+  {
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       S_preset[$mom_spindle_preset_rpm]\opt
+  }
+
+  BLOCK_TEMPLATE spindle_rpm_turn
+  {
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+       S[$mom_spindle_rpm]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  }
+
+  BLOCK_TEMPLATE spindle_smm_turn
+  {
+       G_spin[$mom_sys_spindle_mode_code($spindle_mode)]\opt
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       S[$mom_spindle_speed]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       S_max[$mom_spindle_maximum_rpm]
+  }
+
+  BLOCK_TEMPLATE start_of_program
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_unit[$mom_sys_unit_code($mom_output_unit)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+       F_control[NORM]
+  }
+
+  BLOCK_TEMPLATE stop
+  {
+       M[$mom_sys_program_stop_code]
+  }
+
+  BLOCK_TEMPLATE stop_init
+  {
+       G_motion[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+  }
+
+  BLOCK_TEMPLATE tool_change
+  {
+       T[$mom_tool_number]
+       M[$mom_sys_tool_change_code]
+  }
+
+  BLOCK_TEMPLATE tool_change_init
+  {
+       G_cutcom[40]
+       G_zero[99]
+       G_plane[99]
+       G_feed[0]
+       G_motion[99]
+       G_mode[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+       fourth_axis[9999.999]
+       fifth_axis[9999.999]
+       I[99999.999]
+       J[99999.999]
+       K[99999.999]
+       R[99999.999]
+       D[99]
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+       M_coolant[$mom_sys_coolant_code(OFF)]
+       F[0.0001]
+  }
+
+  BLOCK_TEMPLATE tool_change_name
+  {
+       T_name[=\"$mom_tool_name\"]
+       M[$mom_sys_tool_change_code]
+  }
+
+  BLOCK_TEMPLATE tool_change_number_name
+  {
+       T_name[=\"$mom_tool_number\"]
+       M[$mom_sys_tool_change_code]
+  }
+
+  BLOCK_TEMPLATE tool_change_return_home
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(0)=$lib_sys_home_param(0) $lib_sys_home_leader(1)=$lib_sys_home_param(1)]
+       fourth_axis_home[$lib_sys_home_param(3)]\opt
+       fifth_axis_home[$lib_sys_home_param(4)]\opt
+       D[$mom_tool_adjust_register]\opt
+  }
+
+  BLOCK_TEMPLATE tool_change_return_home_Z
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Text[$lib_sys_home_leader(2)=$lib_sys_home_param(2)]
+       D[0]\opt
+  }
+
+  BLOCK_TEMPLATE tool_change_set_cutcom
+  {
+       Text[SUPA]
+       G_motion[$mom_sys_rapid_code]
+       Z[$mom_sys_home_pos(2)]
+       D[$mom_tool_adjust_register]
+  }
+
+  BLOCK_TEMPLATE tool_length_adjust
+  {
+       D[$mom_tool_adjust_register]
+  }
+
+  BLOCK_TEMPLATE tool_length_adjust_off
+  {
+       D[0]
+  }
+
+  BLOCK_TEMPLATE tool_preselect
+  {
+       T[$mom_next_tool_number]
+  }
+
+  BLOCK_TEMPLATE tool_preselect_name
+  {
+       T_name[=\"$mom_next_tool_name\"]
+  }
+
+  BLOCK_TEMPLATE tool_preselect_number_name
+  {
+       T_name[=\"$mom_next_tool_number\"]
+  }
+
+  BLOCK_TEMPLATE trafoof
+  {
+       transf[TRAFOOF]
+  }
+
+  BLOCK_TEMPLATE traori
+  {
+       transf[TRAORI]
+  }
+
+  BLOCK_TEMPLATE unclamp_fifth_axis
+  {
+       M_clamp_fifth[$mom_sys_unclamp_code_fifth]
+  }
+
+  BLOCK_TEMPLATE unclamp_fourth_axis
+  {
+       M_clamp_fourth[$mom_sys_unclamp_code_fourth]
+  }
+
+  BLOCK_TEMPLATE comment_data
+  {
+       LF_XABS[$mom_pos(0)]
+       LF_YABS[$mom_pos(1)]
+       LF_ZABS[$mom_pos(2)]
+       LF_AAXIS[$mom_pos(3)]
+       LF_BAXIS[$mom_pos(4)]
+       LF_FEED[$mom_feed_rate]
+       LF_SPEED[$mom_spindle_speed]
+  }
+
+  BLOCK_TEMPLATE CYCLE81
+  {
+       cycle_call[CYCLE81]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE82
+  {
+       cycle_call[CYCLE82]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Deep
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_step1]\nows
+       cycle_text[\$mom_cycle_step2]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_dts]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[\$mom_siemens_cycle_o_dis1]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Break_Chip
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_fdpr]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[0]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE84
+  {
+       cycle_call[CYCLE84]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_spindle_speed]\nows
+       cycle_text[\$mom_siemens_cycle_sst1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_var1]\nows
+       cycle_text[\$mom_siemens_cycle_o_dam]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE840
+  {
+       cycle_call[CYCLE840]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdr]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_enc]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Dwell
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE86
+  {
+       cycle_call[CYCLE86]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_text[\$mom_siemens_cycle_rpa]\nows
+       cycle_text[\$mom_siemens_cycle_rpo]\nows
+       cycle_text[\$mom_siemens_cycle_rpap]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE87
+  {
+       cycle_call[CYCLE87]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE88
+  {
+       cycle_call[CYCLE88]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE89
+  {
+       cycle_call[CYCLE89]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE95
+  {
+       cycle_call[CYCLE95]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\"\$mom_siemens_cycle_subroutine_name\"]\nows
+       cycle_text[\$mom_siemens_cycle_mid]\nows
+       cycle_text[\$mom_face_stock]\nows
+       cycle_text[\$mom_radial_stock]\nows
+       cycle_text[\$mom_stock_part]\nows
+       cycle_text[\$mom_feed_cut_value]\nows
+       cycle_text[\$mom_feed_stepover_value]\nows
+       cycle_text[\$mom_feedrate_profile_cut]\nows
+       cycle_text[\$mom_turn_cycle95_machining_type]\nows
+       cycle_text[\$mom_local_return_dwell]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_retract_level_part_distance]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE81_Solutionline
+  {
+       cycle_call[CYCLE81]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE82_Solutionline
+  {
+       cycle_call[CYCLE82]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Deep_Solutionline
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_step1]\nows
+       cycle_text[\$mom_cycle_step2]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_dts]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[\$mom_siemens_cycle_o_dis1]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Break_Chip_Solutionline
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_fdpr]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[0]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE84_Solutionline
+  {
+       cycle_call[CYCLE84]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_spindle_speed]\nows
+       cycle_text[\$mom_siemens_cycle_sst1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_var1]\nows
+       cycle_text[\$mom_siemens_cycle_o_dam]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_pitm]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab_sl]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptaba]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE840_Solutionline
+  {
+       cycle_call[CYCLE840]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdr]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_enc]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_pitm]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab_sl]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptaba]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Solutionline
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Dwell_Solutionline
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE86_Solutionline
+  {
+       cycle_call[CYCLE86]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_text[\$mom_siemens_cycle_rpa]\nows
+       cycle_text[\$mom_siemens_cycle_rpo]\nows
+       cycle_text[\$mom_siemens_cycle_rpap]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE87_Solutionline
+  {
+       cycle_call[CYCLE87]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE88_Solutionline
+  {
+       cycle_call[CYCLE88]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE89_Solutionline
+  {
+       cycle_call[CYCLE89]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[\$mom_cycle_feed_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE95_Solutionline
+  {
+       cycle_call[CYCLE95]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\"\$mom_siemens_cycle_subroutine_name\"]\nows
+       cycle_text[\$mom_siemens_cycle_mid]\nows
+       cycle_text[\$mom_face_stock]\nows
+       cycle_text[\$mom_radial_stock]\nows
+       cycle_text[\$mom_stock_part]\nows
+       cycle_text[\$mom_feed_cut_value]\nows
+       cycle_text[\$mom_feed_stepover_value]\nows
+       cycle_text[\$mom_feedrate_profile_cut]\nows
+       cycle_text[\$mom_turn_cycle95_machining_type]\nows
+       cycle_text[\$mom_local_return_dwell]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_retract_level_part_distance]\nows
+       cycle_text[0]\nows
+       cycle_text[0]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE97
+  {
+       cycle_call[CYCLE97]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_siemens_cycle_pit]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_spl]\nows
+       cycle_text[\$mom_siemens_cycle_fpl]\nows
+       cycle_text[\$mom_siemens_cycle_dm1]\nows
+       cycle_text[\$mom_siemens_cycle_dm2]\nows
+       cycle_text[\$mom_siemens_cycle_app]\nows
+       cycle_text[\$mom_siemens_cycle_rop]\nows
+       cycle_text[\$mom_turn_cycle_total_depth]\nows
+       cycle_text[\$mom_siemens_cycle_fal]\nows
+       cycle_text[\$mom_siemens_cycle_iang]\nows
+       cycle_text[0]\nows
+       cycle_text[\$mom_siemens_cycle_nrc]\nows
+       cycle_text[\$mom_number_of_chases]\nows
+       cycle_text[\$mom_turn_cycle97_machining_type]\nows
+       cycle_text[\$mom_number_of_starts]\nows
+       cycle_text[\$mom_minimum_clearance]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE81_Incremental
+  {
+       cycle_call[CYCLE81]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE82_Incremental
+  {
+       cycle_call[CYCLE82]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Deep_Incremental
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_step1]\nows
+       cycle_text[\$mom_cycle_step2]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_dts]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[\$mom_siemens_cycle_o_dis1]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Break_Chip_Incremental
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_fdpr]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[0]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE84_Incremental
+  {
+       cycle_call[CYCLE84]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_spindle_speed]\nows
+       cycle_text[\$mom_siemens_cycle_sst1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_var1]\nows
+       cycle_text[\$mom_siemens_cycle_o_dam]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE840_Incremental
+  {
+       cycle_call[CYCLE840]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdr]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_enc]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Incremental
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Dwell_Incremental
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE86_Incremental
+  {
+       cycle_call[CYCLE86]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_text[\$mom_siemens_cycle_rpa]\nows
+       cycle_text[\$mom_siemens_cycle_rpo]\nows
+       cycle_text[\$mom_siemens_cycle_rpap]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE87_Incremental
+  {
+       cycle_call[CYCLE87]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE88_Incremental
+  {
+       cycle_call[CYCLE88]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE89_Incremental
+  {
+       cycle_call[CYCLE89]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE86_Solutionline_Incremental
+  {
+       cycle_call[CYCLE86]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_text[\$mom_siemens_cycle_rpa]\nows
+       cycle_text[\$mom_siemens_cycle_rpo]\nows
+       cycle_text[\$mom_siemens_cycle_rpap]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE81_Solutionline_Incremental
+  {
+       cycle_call[CYCLE81]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE82_Solutionline_Incremental
+  {
+       cycle_call[CYCLE82]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Deep_Solutionline_Incremental
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_cycle_step1]\nows
+       cycle_text[\$mom_cycle_step2]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$mom_siemens_cycle_dts]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[1]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[\$mom_siemens_cycle_o_dis1]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE83_Break_Chip_Solutionline_Incremental
+  {
+       cycle_call[CYCLE83]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_fdpr]\nows
+       cycle_text[\$mom_siemens_cycle_dam]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_frf]\nows
+       cycle_text[0]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_cycle_step3]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_dtd]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE84_Solutionline_Incremental
+  {
+       cycle_call[CYCLE84]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_cycle_orient]\nows
+       cycle_text[\$mom_spindle_speed]\nows
+       cycle_text[\$mom_siemens_cycle_sst1]\nows
+       cycle_text[0]\nows
+       cycle_text[1]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_var1]\nows
+       cycle_text[\$mom_siemens_cycle_o_dam]\nows
+       cycle_text[\$mom_siemens_cycle_o_vrt]\nows
+       cycle_text[\$mom_siemens_cycle_o_pitm]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab_sl]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptaba]\nows
+       cycle_text[\$mom_siemens_cycle_gmode]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE840_Solutionline_Incremental
+  {
+       cycle_call[CYCLE840]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdr]\nows
+       cycle_text[\$mom_siemens_cycle_sdac]\nows
+       cycle_text[\$mom_siemens_cycle_enc]\nows
+       cycle_text[\$mom_siemens_cycle_mpit]\nows
+       cycle_text[\$mom_siemens_cycle_pit]\nows
+       cycle_text[\$mom_siemens_cycle_o_axn]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab]\nows
+       cycle_text[\$mom_siemens_cycle_o_techno]\nows
+       cycle_text[\$mom_siemens_cycle_o_pitm]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptab_sl]\nows
+       cycle_text[\$mom_siemens_cycle_o_ptaba]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Solutionline_Incremental
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE85_Bore_Dwell_Solutionline_Incremental
+  {
+       cycle_call[CYCLE85]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_pos($mom_cycle_spindle_axis)]\nows
+       cycle_text[\$mom_cycle_rapid_to]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_siemens_cycle_dtb]\nows
+       cycle_text[\$feed]\nows
+       cycle_text[\$mom_siemens_cycle_rff]\nows
+       cycle_text[ ]\nows
+       cycle_text[\$mom_siemens_cycle_dmode]\nows
+       cycle_text[\$mom_siemens_cycle_amode]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE87_Solutionline_Incremental
+  {
+       cycle_call[CYCLE87]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE88_Solutionline_Incremental
+  {
+       cycle_call[CYCLE88]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_text[\$mom_siemens_cycle_sdir]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE89_Solutionline_Incremental
+  {
+       cycle_call[CYCLE89]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_cycle_retract_to_pos($mom_cycle_spindle_axis)]\nows
+       cycle_digit[\$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane]\nows
+       cycle_text[\$mom_cycle_clearance_plane]\nows
+       cycle_text[ ]\nows
+       cycle_digit[abs($mom_cycle_feed_to_pos($mom_cycle_spindle_axis)-($mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)-$mom_cycle_clearance_plane))]\nows
+       cycle_text[\$mom_cycle_delay]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE800
+  {
+       cycle_call[CYCLE800]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$lib_parameter(cycle800,_FR)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_TC)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_ST)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_MODE)]\nows
+       cycle_text[\$lib_parameter(cycle800,_X0)]\nows
+       cycle_text[\$lib_parameter(cycle800,_Y0)]\nows
+       cycle_text[\$lib_parameter(cycle800,_Z0)]\nows
+       cycle_text[\$lib_parameter(cycle800,_A)]\nows
+       cycle_text[\$lib_parameter(cycle800,_B)]\nows
+       cycle_text[\$lib_parameter(cycle800,_C)]\nows
+       cycle_text[\$lib_parameter(cycle800,_X1)]\nows
+       cycle_text[\$lib_parameter(cycle800,_Y1)]\nows
+       cycle_text[\$lib_parameter(cycle800,_Z1)]\nows
+       cycle_text[\$lib_parameter(cycle800,_DIR)]\nows
+       cycle_text[\$lib_parameter(cycle800,_FR_I)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_DMODE)]\nows\opt
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE800_reset
+  {
+       cycle_call[CYCLE800]\nows
+       cycle_start_character[(]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE800_reset_turn
+  {
+       cycle_call[CYCLE800]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$lib_linked_var(CONF_S840D_cycle800@_FR)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_TC)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_ST)]\nows
+       cycle_text[\$lib_linked_var(CONF_S840D_cycle800@_MODE)]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[0.0]\nows
+       cycle_text[\$lib_parameter(cycle800,_DIR)]\nows
+       cycle_text[\$lib_parameter(cycle800,_FR_I)]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE832
+  {
+       cycle_call[CYCLE832]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[_camtolerance]\nows
+       cycle_text[\$cycle832_tolm]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE832_v7
+  {
+       cycle_call[CYCLE832]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[_camtolerance]\nows
+       cycle_text[\$cycle832_tolm]\nows
+       cycle_text[\$cycle832_v832]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE832_v47
+  {
+       cycle_call[CYCLE832]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$cycle832_camtolerance]\nows
+       cycle_text[\$cycle832_tolm]\nows
+       cycle_text[\$cycle832_otolm]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE832_v45
+  {
+       cycle_call[CYCLE832]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$cycle832_camtolerance]\nows
+       cycle_text[\$cycle832_tolm]\nows
+       cycle_text[\$cycle832_otolm]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE832_v44
+  {
+       cycle_call[CYCLE832]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$cycle832_camtolerance]\nows
+       cycle_text[\$cycle832_tolm]\nows
+       cycle_text[\$cycle832_v832]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE CYCLE90
+  {
+  	cycle_call[CYCLE90]\nows
+  	cycle_start_character[(]\nows
+  	cycle_digit_first[\$lib_parameter(cycle90,_RTP)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_RFP)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_SDIS)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_DP)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_DPR)]\nows
+  	cycle_text[\$lib_parameter(cycle90,_DIATH)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_KDIAM)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_PIT)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_FFR)]\nows
+  	cycle_text[\$lib_parameter(cycle90,_CDIR)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_TYPTH)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_CPA)]\nows
+  	cycle_digit[\$lib_parameter(cycle90,_CPO)]\nows
+  	cycle_end_character[)]\nows
+  }
+  BLOCK_TEMPLATE thread_move_turn
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_spin[$mom_sys_spindle_mode_code($spindle_mode)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_motion[33]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       K[$mom_lathe_thread_lead_k]
+       D[$mom_tool_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE MCALL
+  {
+       cycle_call[MCALL]\nows
+  }
+
+  BLOCK_TEMPLATE ORIRESET
+  {
+       cycle_call[ORIRESET]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[\$mom_out_angle_pos(0)]\nows
+       cycle_text[\$mom_out_angle_pos(1)]\nows
+       cycle_end_character[)]\nows
+  }
+
+  BLOCK_TEMPLATE sync_call
+  {
+       cycle_call[WAITM]\nows
+       cycle_start_character[(]\nows
+       cycle_text_first[$mom_sync_number]\nows
+       cycle_text[1,$mom_number_of_runs]\nows
+       cycle_end_character[)]\nows
+  }
+  BLOCK_TEMPLATE machine_axis_move
+  {
+  	G[53]
+  	G_motion[$mom_sys_rapid_code]
+  	X_AXIS[$mom_transition_x_axis]\opt
+  	Y_AXIS[$mom_transition_y_axis]\opt
+  	Z_AXIS[$mom_transition_z_axis]\opt
+  	A_AXIS[$mom_transition_a_axis]\opt
+  	B_AXIS[$mom_transition_b_axis]\opt
+  	C_AXIS[$mom_transition_c_axis]\opt
+  	D[0]
+  }
+
+  BLOCK_TEMPLATE transition_rapid_move
+  {
+  	G_offset[$mom_fixture_offset_value + 53 + 447*($mom_fixture_offset_value>4)]\opt
+  	G_motion[$mom_sys_rapid_code]
+  	X_AXIS[$mom_transition_x_axis]\opt
+  	Y_AXIS[$mom_transition_y_axis]\opt
+  	Z_AXIS[$mom_transition_z_axis]\opt
+  	A_AXIS[$mom_transition_a_axis]\opt
+  	B_AXIS[$mom_transition_b_axis]\opt
+  	C_AXIS[$mom_transition_c_axis]\opt
+  	D[$mom_tool_adjust_register]\opt
+  }
+}

@@ -1,0 +1,76 @@
+
+MACHINE SIEMENS
+
+#-----------------------------------------------------------------
+
+
+
+EVENT high_speed_setting
+{
+   UI_LABEL "Sinumerik 840D"
+   CATEGORY MILL
+   PARAM command_status
+   {
+      TYPE o
+      DEFVAL "Active"
+      OPTIONS "Active","Inactive"
+      UI_LABEL "Status"
+   }
+   PARAM ude_siemens_tolerance_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Tolerance"
+   }
+   PARAM siemens_tol
+   {
+      TYPE d
+      DEFVAL "0.01"
+      TOGGLE Off
+      UI_LABEL "User Defined Tolerance"
+   }
+   PARAM ude_siemens_tolerance_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+   PARAM ude_siemens_hsm
+   {
+      TYPE g
+      DEFVAL "start_open"
+      UI_LABEL "High Speed Machining"
+   }
+   PARAM siemens_compressor
+   {
+      TYPE o
+      DEFVAL "On"
+      OPTIONS "On","Off"
+      UI_LABEL "Compressor"
+   }
+   PARAM siemens_smoothing
+   {
+      TYPE o
+      DEFVAL "On"
+      OPTIONS "On","Off"
+      UI_LABEL "Smoothing"
+   }
+   PARAM siemens_feedforward
+   {
+      TYPE o
+      DEFVAL "On"
+      OPTIONS "On","Off"
+      UI_LABEL "Feed Forward"
+   }
+   PARAM ude_siemens_hsm_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+ 
+ 
+}
+
+
+#-----------------------------------------------------------------
+
+

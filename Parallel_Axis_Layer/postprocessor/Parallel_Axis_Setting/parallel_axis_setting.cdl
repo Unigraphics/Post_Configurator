@@ -1,0 +1,47 @@
+#############################################################################################
+#
+#   Parallel Axis Setting Layer
+#
+#############################################################################################
+#
+#   Copyright 2020 Siemens Digital Industries Software
+#               All Rights Reserved.
+#
+#############################################################################################
+# Description
+# Parallel axis output in operation for reuse controller independent. To reuse import the layer in
+# an existing post processor by the Layer Import option from Post Configurator.
+#############################################################################################
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 15-Jun-2020  HZ                    Initial version
+# $HISTORY$ 
+#############################################################################################
+
+MACHINE Default
+
+EVENT set_parallel_axis
+{
+	UI_LABEL "Set Parallel Axis"
+
+	PARAM command_status
+	{
+		TYPE 	 o
+		DEFVAL   "Active"
+		OPTIONS  "Active","Inactive","User Defined"
+		UI_LABEL "Status"
+	}
+	PARAM parallel_axis_mode
+	{
+		TYPE 	 o
+		DEFVAL   "W-Z"
+		OPTIONS  "W-Z","V-Y","U-X","Z-W","Y-V","X-U"
+		UI_LABEL "Parallel Axis Mode"
+	}
+	PARAM quill_axis_position
+	{
+		TYPE     d
+		DEFVAL   "0.0000"
+		UI_LABEL "Quill Axis Position"
+	}
+}

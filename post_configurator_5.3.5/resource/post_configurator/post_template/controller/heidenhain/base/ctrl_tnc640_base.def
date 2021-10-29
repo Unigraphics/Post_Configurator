@@ -1,0 +1,303 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 04-Aug-2020  Li Li                 Reset sequence number
+# $HISTORY$
+
+MACHINE HEIDENHAIN_TNC640
+
+INCLUDE { $UGII_CAM_USER_DEF_EVENT_DIR/ude.cdl }
+
+FORMATTING
+{
+  WORD_SEPARATOR " "
+  END_OF_LINE ""
+  SEQUENCE sequence_number 1 1 1 99999
+
+  ADDRESS Turndata
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      "FUNCTION TURNDATA SPIN VCONST:"
+  }
+  ADDRESS VC
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      LEADER      "VC:"
+  }
+  ADDRESS S_max
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      LEADER      "SMAX"
+      OMIT	  "99999"
+  }
+
+  BLOCK_TEMPLATE spindle_rpm_turn
+  {
+       Turndata[OFF]
+       S[$mom_spindle_rpm]
+  }
+
+  BLOCK_TEMPLATE spindle_smm_turn
+  {
+       Turndata[ON]
+       VC[$mom_spindle_speed]
+       S_max[$mom_spindle_maximum_rpm]
+  }
+
+  BLOCK_TEMPLATE circular_move_turn
+  {
+       Text[CC]
+       I[$mom_pos_arc_center(0)*$x_factor]
+       K[$mom_pos_arc_center(2)]
+  }
+  BLOCK_TEMPLATE circular_move_turn_1
+  {
+       G_motion[C]\opt
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       circle_direction[$mom_sys_circle_code($mom_arc_direction)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE linear_move_turn
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+  BLOCK_TEMPLATE rapid_move_turn
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE CYCL_241
+  {
+       cycle_call[241]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@SINGLE-LIP DEEP-HOLE DRILLING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q379[$lib_parameter_cycle(379)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@379)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q426[$lib_parameter_cycle(426)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@426)]
+       cycle_seperator[ ]
+       Q427[$lib_parameter_cycle(427)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@427)]
+       cycle_seperator[ ]
+       Q428[$lib_parameter_cycle(428)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@428)]
+       cycle_seperator[ ]
+       Q429[$lib_parameter_cycle(429)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@429)]
+       cycle_seperator[ ]
+       Q430[$lib_parameter_cycle(430)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@430)]
+       cycle_seperator[ ]
+       Q435[$lib_parameter_cycle(435)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@435)]
+       cycle_seperator[ ]
+       Q401[$lib_parameter_cycle(401)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@401)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q212[$lib_parameter_cycle(212)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@212)]
+       cycle_seperator[ ]
+       Q205[$lib_parameter_cycle(205)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@205)]
+  }
+
+  BLOCK_TEMPLATE CYCL_252
+  {
+       cycle_call[252]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@CIRCULAR POCKET)]
+       cycle_seperator[ ]
+       Q215[$lib_parameter_cycle(215)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@215)]
+       cycle_seperator[ ]
+       Q223[$lib_parameter_cycle(223)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@223)]
+       cycle_seperator[ ]
+       Q368[$lib_parameter_cycle(368)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@368)]
+       cycle_seperator[ ]
+       Q207[$lib_parameter_cycle(207)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q369[$lib_parameter_cycle(369)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@369)]
+       cycle_seperator[ ]
+       Q206[$mom_cycle_feed_rate]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q338[$lib_parameter_cycle(338)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@338)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q370[$lib_parameter_cycle(370)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@370)]
+       cycle_seperator[ ]
+       Q366[$lib_parameter_cycle(366)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@366)]
+       cycle_seperator[ ]
+       Q385[$lib_parameter_cycle(385)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@385)]
+       cycle_seperator[ ]
+       Q439[$lib_parameter_cycle(439)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@439)]
+  }
+
+  BLOCK_TEMPLATE CYCL_800
+  {
+       cycle_call[800]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@ADJUST XZ SYSTEM)]
+       cycle_seperator[ ]
+       Q497[$lib_parameter_cycle(497)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@497)]
+       cycle_seperator[ ]
+       Q498[$lib_parameter_cycle(498)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@498)]
+       cycle_seperator[ ]
+       Q530[$lib_parameter_cycle(530)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@530)]
+       cycle_seperator[ ]
+       Q531[$lib_parameter_cycle(531)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@531b)]
+       cycle_seperator[ ]
+       Q532[$lib_parameter_cycle(532)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@532)]
+       cycle_seperator[ ]
+       Q533[$lib_parameter_cycle(533)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@533)]
+       cycle_seperator[ ]
+       Q535[$lib_parameter_cycle(535)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@535)]
+       cycle_seperator[ ]
+       Q536[$lib_parameter_cycle(536)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@536)]
+  }
+
+  BLOCK_TEMPLATE CYCL_801
+  {
+       cycle_call[801]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@RESET ROTARY COORDINATE SYSTEM)]
+  }
+
+  BLOCK_TEMPLATE CYCL_831
+  {
+       cycle_call[831]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@THREAD LONGITUDINAL)]
+       cycle_seperator[ ]
+       Q471[$lib_parameter_cycle(471)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@471)]
+       cycle_seperator[ ]
+       Q460[$lib_parameter_cycle(460)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@460)]
+       cycle_seperator[ ]
+       Q491[$lib_parameter_cycle(491)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@491)]
+       cycle_seperator[ ]
+       Q472[$lib_parameter_cycle(472)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@472)]
+       cycle_seperator[ ]
+       Q473[$lib_parameter_cycle(473)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@473)]
+       cycle_seperator[ ]
+       Q492[$lib_parameter_cycle(492)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@492)]
+       cycle_seperator[ ]
+       Q494[$lib_parameter_cycle(494)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@494)]
+       cycle_seperator[ ]
+       Q474[$lib_parameter_cycle(474)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@474)]
+       cycle_seperator[ ]
+       Q463[$lib_parameter_cycle(463)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@463)]
+       cycle_seperator[ ]
+       Q467[$lib_parameter_cycle(467)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@467)]
+       cycle_seperator[ ]
+       Q468[$lib_parameter_cycle(468)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@468)]
+       cycle_seperator[ ]
+       Q470[$lib_parameter_cycle(470)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@470)]
+       cycle_seperator[ ]
+       Q475[$lib_parameter_cycle(475)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@475)]
+       cycle_seperator[ ]
+       Q476[$lib_parameter_cycle(476)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@476)]
+       cycle_seperator[ ]
+  }
+}

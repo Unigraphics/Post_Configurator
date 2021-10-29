@@ -1,0 +1,321 @@
+############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+#=============================================================================================
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 25-May-2020  LL             Add version history
+# 15-Jun-2020  BI             Fix comment leader issue
+# 29-Jan-2021  IT             Removed AdditiveTrigger address
+# $HISTORY$ 
+
+MACHINE DEFAULT
+FORMATTING
+{
+  FORMAT AbsCoord "&__5.40"
+  FORMAT AbsCoord_IN "&__5.4_"
+  FORMAT Dwell_SECONDS "&__5.30"
+  FORMAT String_Cycle "%s"
+  FORMAT String_Zero "&_01.10"
+  FORMAT Digit_Cycle "&_01.9_"
+  FORMAT DepoValue "&_01.40"
+  
+  ADDRESS cust_delay
+  {
+  	FORMAT Dwell_SECONDS
+  	FORCE always
+  	MAX 99999.999000 Truncate
+  	LEADER "F"
+  }
+  ADDRESS JobNumber
+  {
+  	FORMAT Digit_command
+  	FORCE off
+  	LEADER [$lib_linked_var(SDIS_technology_obj@job_number_variable_name)=]
+  }
+  ADDRESS MotionType
+  {
+  	FORMAT String
+  	FORCE off
+  	LEADER [$lib_linked_var(CONF_GE_msg@message_dspa1)]
+  	TRAILER [$lib_linked_var(CONF_GE_msg@message_dspz1)]
+  }
+  ADDRESS ExternalAxis
+  {
+  	FORMAT AbsCoord
+  	FORCE always
+  	LEADER [$lib_linked_var(SDIS_technology_obj@fdm_external_axis_name)$external_axis_leader]
+  	TRAILER [$external_axis_trailer]
+  }
+  ADDRESS Deposition_command
+  {
+  	FORMAT String
+  	FORCE off
+  	LEADER ""
+  	TRAILER [$::deposition_status]
+  }
+  ADDRESS Text_modal1
+  {
+  	FORMAT DepoValue
+  	FORCE off
+  	LEADER [$lib_linked_var(CONF_GE_msg@message_dspa1) DEPOSITION HEIGHT=]
+   TRAILER [$lib_linked_var(CONF_GE_msg@message_dspz1)]
+  }
+  ADDRESS Text_modal2
+  {
+  	FORMAT DepoValue
+  	FORCE off
+  	LEADER [$lib_linked_var(CONF_GE_msg@message_dspa1) DEPOSITION WIDTH=]
+   TRAILER [$lib_linked_var(CONF_GE_msg@message_dspz1)]
+  }
+  ADDRESS R20
+  {
+    FORMAT      Digit_command
+    FORCE       always
+    LEADER      "R20="
+    ZERO_FORMAT Zero_command
+  }
+  ADDRESS G_additive_header
+  {
+    FORMAT      Digit_command
+    FORCE       always
+    LEADER      "G"
+    ZERO_FORMAT Zero_command
+  }
+  ADDRESS DED_power
+  {
+    FORMAT      Digit_3
+    FORCE       off
+    LEADER      "Power="
+  }
+  ADDRESS DED_powder
+  {
+    FORMAT      Digit_3
+    FORCE       always
+    LEADER      [Powder$laserParams(5)=]
+  }
+  ADDRESS DED_carriergas
+  {
+    FORMAT      Digit_3
+    FORCE       always
+    LEADER      [Carriergas$laserParams(5)=]
+  }
+  ADDRESS DED_stirrer
+  {
+    FORMAT      Digit_3
+    FORCE       always
+    LEADER      [Stirrer$laserParams(5)=]
+  }
+  ADDRESS DED_shieldgas
+  {
+    FORMAT      Digit_3
+    FORCE       off
+    LEADER      "Shieldgas="
+  }
+  ################ CYCLE ADDRESS DECLARATIONS ################
+
+  ADDRESS cycle_call
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_comment
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_seperator
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_start_character
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_end_character
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_description
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_text_first
+  {
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT String_Zero
+  }
+
+  ADDRESS cycle_text
+  {
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      ","
+      ZERO_FORMAT String_Zero
+  }
+  # This type must be used when a calculation is to take place
+  ADDRESS cycle_digit
+  {
+      FORMAT      Digit_Cycle
+      FORCE       always
+      LEADER      ","
+      ZERO_FORMAT String_Zero
+  }
+  BLOCK_TEMPLATE additive_deposition
+  {
+  	Deposition_command[$mom_deposition_state]
+  }
+  BLOCK_TEMPLATE additive_width
+  {
+  	Text_modal2[$::mom_deposition_width]
+  }
+  BLOCK_TEMPLATE additive_height
+  {
+  	Text_modal1[$::mom_deposition_height]
+  }
+  BLOCK_TEMPLATE linear_move
+  {
+  	G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+  	G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+  	G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+  	G_motion[$mom_sys_linear_code]
+  	G_mode[$mom_sys_output_code($mom_output_mode)]
+  	X[$mom_pos(0)*$x_factor]
+  	Y[$mom_pos(1)]
+  	Z[$mom_pos(2)]
+  	fourth_axis[$mom_out_angle_pos(0)]
+  	fifth_axis[$mom_out_angle_pos(1)]
+  	X_vector[$mom_tool_axis(0)]\opt
+  	Y_vector[$mom_tool_axis(1)]\opt
+  	Z_vector[$mom_tool_axis(2)]\opt
+  	S[$mom_spindle_rpm]
+  	D[$mom_tool_adjust_register]\opt
+  	M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  	M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  	M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+  	F[$feed]
+  	ExternalAxis[$::mom_material_extrusion_value]\opt
+  	MotionType[$::sdis_motion_type]\opt
+  }
+  BLOCK_TEMPLATE rapid_move
+  {
+  	G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+  	G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+  	G_motion[$mom_sys_rapid_code]
+  	X[$mom_pos(0)*$x_factor]
+  	Y[$mom_pos(1)]
+  	Z[$mom_pos(2)]
+  	fourth_axis[$mom_out_angle_pos(0)]
+  	fifth_axis[$mom_out_angle_pos(1)]
+  	X_vector[$mom_tool_axis(0)]\opt
+  	Y_vector[$mom_tool_axis(1)]\opt
+  	Z_vector[$mom_tool_axis(2)]\opt
+  	S[$mom_spindle_rpm]
+  	D[$mom_tool_adjust_register]
+  	M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  	M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  	MotionType[$::sdis_motion_type]\opt
+  }
+  BLOCK_TEMPLATE circular_move
+  {
+  	G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+  	G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+  	G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+  	G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+  	G_mode[$mom_sys_output_code($mom_output_mode)]
+  	X[$mom_pos(0)*$x_factor]
+  	Y[$mom_pos(1)]
+  	Z[$mom_pos(2)]
+  	I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]
+  	J[$mom_pos_arc_center(1) - $mom_prev_pos(1)]
+  	K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]
+  	R[$mom_arc_radius]
+  	helix_turn[$mom_helix_turn_number]\opt
+  	S[$mom_spindle_rpm]
+  	M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  	M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+  	M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+  	F[$feed]
+    ExternalAxis[$::mom_material_extrusion_value]\opt
+  	MotionType[$::sdis_motion_type]\opt
+  }
+  BLOCK_TEMPLATE extrusion_retract
+  {
+  	ExternalAxis[$::mom_material_extrusion_value]\opt
+  	MotionType[$::sdis_motion_type]\opt
+  }
+  BLOCK_TEMPLATE R20
+  {
+  	R20[$waam_monitoring_number]
+  }
+  BLOCK_TEMPLATE additive_header_custom
+  {
+  	G_additive_header[645]
+  }
+  BLOCK_TEMPLATE material_extrusion_delay
+  {
+  	G_dwell[$mom_sys_delay_code($mom_delay_mode)]
+  	cust_delay[$::material_extrusion_delay_value]
+  }
+    BLOCK_TEMPLATE job_number_main
+  {
+  	JobNumber[$jobNumber_main]
+  }
+  BLOCK_TEMPLATE job_number_stepover
+  {
+  	JobNumber[$jobNumber_stepover]
+  }
+  BLOCK_TEMPLATE job_number_finish
+  {
+  	JobNumber[$jobNumber_finish]
+  }
+  BLOCK_TEMPLATE DED_params
+  {
+	DED_power[$laserParams(0)]
+	DED_powder[$laserParams(1)]
+	DED_carriergas[$laserParams(2)]
+	DED_stirrer[$laserParams(3)]
+	DED_shieldgas[$laserParams(4)]
+  }
+  BLOCK_TEMPLATE ded_settings_on
+  {
+  	cycle_call[ded_settings_on]\nows
+    cycle_start_character[(]\nows
+    cycle_text_first[$laserParams(0)]\nows
+	cycle_text[$laserParams(1)]\nows
+	cycle_text[$laserParams(2)]\nows
+	cycle_text[$laserParams(3)]\nows
+	cycle_text[$laserParams(4)]\nows
+    cycle_end_character[)]\nows
+  }
+  BLOCK_TEMPLATE ded_settings_off
+  {
+  	cycle_call[ded_settings_off]\nows
+  }
+  BLOCK_TEMPLATE additive_calculate_feedrate
+  {
+    F[$feed]\opt
+  }
+}
+

@@ -1,0 +1,525 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#=============================================================================================
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 20-Aug-2020  HZ					 Define G_plane of circular_move by arc plane
+# $HISTORY$
+#############################################################################################
+
+MACHINE OKUMA
+
+INCLUDE { $UGII_CAM_USER_DEF_EVENT_DIR/ude.cdl }
+
+FORMATTING
+{
+  WORD_SEPARATOR " "
+  END_OF_LINE ""
+  SEQUENCE sequence_number 1 1 1 9999
+
+  ADDRESS CALRG
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS BA
+  {
+      FORMAT      Rotary
+      FORCE       always
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      "BA="
+  }
+
+  ADDRESS R
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "L"
+  }
+
+  ADDRESS T
+  {
+      FORMAT      Tcode
+      FORCE       off
+      LEADER      "MT="
+  }
+
+  ADDRESS TD
+  {
+      FORMAT      Tcode_6
+      FORCE       always
+      LEADER      "TD="
+  }
+
+  ADDRESS TL
+  {
+      FORMAT      Tcode_6
+      FORCE       always
+      LEADER      "TL="
+  }
+
+  ADDRESS TS
+  {
+      FORMAT      Tcode_6
+      FORCE       always
+      LEADER      "TS="
+  }
+
+  ADDRESS cycle_dwell
+  {
+      FORMAT      Dwell_SECONDS
+      FORCE       off
+      LEADER      "E"
+      ZERO_FORMAT Zero_int
+      OMIT "0"
+  }
+
+  ADDRESS D_cycle
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "D"
+  }
+
+  ADDRESS L_cycle
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "L"
+  }
+
+  ADDRESS K_cycle
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(K_cycle)]
+  }
+
+  ADDRESS Q_cycle
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "D"
+  }
+
+  ADDRESS HP
+  {
+      FORMAT      Digit_2
+      FORCE       always
+      LEADER      "HP="
+      OMIT "0"
+  }
+
+  ADDRESS SX
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "SX="
+  }
+
+  ADDRESS SY
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "SY="
+  }
+
+  ADDRESS SZ
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "SZ="
+  }
+
+############ BLOCK TEMPLATE DECLARATIONS #############
+  BLOCK_TEMPLATE absolute_mode
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+       G_plane[$mom_sys_cutcom_plane_code(XY)]\opt
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+  }
+
+  BLOCK_TEMPLATE circular_move
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_pos_arc_plane)]\opt
+       G_adjust[$mom_sys_adjust_code($tool_axis)]
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       CALRG[$calrg]\opt
+       X[$mom_pos(0)]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]
+       J[$mom_pos_arc_center(1) - $mom_prev_pos(1)]
+       K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]
+       helix_turn[$mom_helix_turn_number]\opt
+       R[$mom_arc_radius]
+       F[$feed]
+       S[$mom_spindle_rpm]
+       D[$cutcom_adjust_register]\opt
+       H[$mom_tool_adjust_register]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+  }
+
+  BLOCK_TEMPLATE circular_move_turn
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code(ZX)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_circle_code($mom_arc_direction)]\opt
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       CALRG[$calrg]\opt
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       I[$mom_pos_arc_center(0) - $mom_prev_pos(0)]
+       K[$mom_pos_arc_center(2) - $mom_prev_pos(2)]
+       R[$mom_arc_radius]
+       F[$feed]
+       S[$mom_spindle_speed]
+       D[$cutcom_adjust_register]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_move
+  {
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_adjust[$mom_sys_adjust_code($tool_axis)]
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_linear_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_rapid_to_pos(0)*$x_factor]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Z[$mom_cycle_rapid_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]\opt
+       Y_vector[$mom_tool_axis(1)]\opt
+       Z_vector[$mom_tool_axis(2)]\opt
+       S[$mom_spindle_rpm]
+       D[$cutcom_adjust_register]\opt
+       H[$mom_tool_adjust_register]
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M_range[$mom_sys_spindle_range_code($mom_spindle_range)]\opt
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_bore
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+  }
+
+  BLOCK_TEMPLATE cycle_bore_back
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_back_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       I_cycle[$i_shift_value]\opt
+       J_cycle[$j_shift_value]\opt
+       K_cycle[$k_shift_value]\opt
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_bore_drag
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_drag_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_bore_dwell
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_dwell_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_bore_manual
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_manual_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+  }
+
+  BLOCK_TEMPLATE cycle_bore_manual_dwell
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_manual_dwell_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_bore_no_drag
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_bore_no_drag_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       I_cycle[$i_shift_value]\opt
+       J_cycle[$j_shift_value]\opt
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_drill
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_drill_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+  }
+
+  BLOCK_TEMPLATE cycle_drill_break_chip
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_drill_break_chip_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       Q_cycle[$mom_cycle_step1]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_drill_deep
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_drill_deep_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       Q_cycle[$mom_cycle_step1]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       L_cycle[$mom_cycle_cam]\opt
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_drill_dwell
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_drill_dwell_code]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE cycle_init
+  {
+       G_motion[80]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+       fifth_axis[99999.999]
+       F[99999.999]
+       cycle_dwell[99999]
+       I_cycle[99999.999]
+       J_cycle[99999.999]
+       K_cycle[99999.999]
+       D_cycle[99999.999]
+       L_cycle[99999.999]
+       Q_cycle[99999.999]
+       R_cycle[99999.999]
+  }
+
+  BLOCK_TEMPLATE cycle_off
+  {
+       G_motion[$mom_sys_cycle_off]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+  }
+
+  BLOCK_TEMPLATE cycle_tap
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]
+       G_motion[$mom_sys_cycle_tap_code($mom_spindle_direction)]
+       G_mode[$mom_sys_output_code($mom_output_mode)]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       K_cycle[($initial_cycle_pos($tool_axis)-$mom_cycle_rapid_to_pos($tool_axis))*$cycle_factor]
+       cycle_dwell[$mom_cycle_delay]\opt
+  }
+
+  BLOCK_TEMPLATE lathe_thread_move
+  {
+       G_motion[$mom_sys_lathe_thread_advance_type($thread_type)]
+       X[$mom_pos(0)*$x_factor]
+       Z[$mom_pos(2)]
+       F[$mom_lathe_thread_lead]
+  }
+
+  BLOCK_TEMPLATE return_move
+  {
+       G_return[$mom_sys_home_code]
+       HP[4]
+  }
+
+  BLOCK_TEMPLATE set_csys_on
+  {
+       G_csys_rot[$mom_sys_csys_rot_code(ON)]
+	fourth_axis[$b_angle_pos]
+  }
+
+  BLOCK_TEMPLATE start_of_program
+  {
+       G_cutcom[$mom_sys_cutcom_code(OFF)]
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_feed[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+  }
+
+  BLOCK_TEMPLATE tl_output
+  {
+  	BA[$b_angle_pos]
+  	TL[($mom_tool_number*1000)+$mom_tool_adjust_register]
+  	M[602]
+  }
+
+  BLOCK_TEMPLATE tool_select
+  {
+       T[($mom_tool_number*100)+$mom_tool_adjust_register]
+  }
+
+  BLOCK_TEMPLATE tool_preselect
+  {
+       T[($mom_next_tool_number*100)+1]
+  }
+
+  BLOCK_TEMPLATE zero_point_shift_on
+  {
+  	G[174]
+  	SX[$lib_parameter(csys_trans,_X0)]
+  	SY[$lib_parameter(csys_trans,_Y0)]
+  	SZ[$lib_parameter(csys_trans,_Z0)]
+  }
+
+  BLOCK_TEMPLATE zero_point_shift_off
+  {
+  	G[175]
+  }
+
+  BLOCK_TEMPLATE yaxis_mode_on
+  {
+  	G[138]
+  }
+
+  BLOCK_TEMPLATE yaxis_mode_off
+  {
+  	G[136]
+  }
+}

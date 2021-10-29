@@ -1,0 +1,22 @@
+MACHINE FANUC
+
+FORMATTING
+{
+  SEQUENCE sequence_number 1 1 1 999999
+  
+  
+   BLOCK_TEMPLATE return_rotary_axis_to_zero 
+  {
+       G_mode[$mom_sys_output_code(ABSOLUTE)]
+       G_return[$mom_sys_return_code]
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[0]\opt
+       fifth_axis[0]\opt
+  }
+  
+  
+  
+
+}
+
+

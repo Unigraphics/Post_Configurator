@@ -1,0 +1,1199 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+
+MACHINE HEIDENHAIN_TNC640
+EVENT lib_event_cycle_32
+{
+	UI_LABEL "CYCL DEF 32"
+	PARAM cycle_32_status
+	{
+		TYPE o
+		DEFVAL "OFF"
+		OPTIONS "OFF", "ON"
+		UI_LABEL "CYCL 32 ON/OFF"
+	}
+	PARAM cycle_32_tolerance
+	{
+		TYPE d
+		DEFVAL "0.050000"
+		TOGGLE On
+		UI_LABEL "Tolerance Value T"
+	}
+	PARAM cycle_32_mode_optional_output
+	{
+		TYPE o
+		DEFVAL "ON"
+		OPTIONS "ON", "OFF"
+		UI_LABEL "Optional output CYCL DEF 32.2"
+	}
+	PARAM cycle_32_mode
+	{
+		TYPE o
+		DEFVAL "1"
+		OPTIONS "0", "1"
+		UI_LABEL "HSC mode"
+	}
+	PARAM cycle_32_tolerance_rotary
+	{
+		TYPE d
+		DEFVAL "5.000000"
+		TOGGLE On
+		UI_LABEL "Tolerance rotary axes"
+	}
+	PARAM cycle_32_use_operation
+	{
+		TYPE o
+		DEFVAL "OFF"
+		OPTIONS "OFF", "ON"
+		UI_LABEL "Use Camtolerance from Operation or Method"
+	}
+}
+
+EVENT lib_event_cycle_200
+{
+   UI_LABEL "CYCL DEF 200 DRILLING"
+   CATEGORY DRILL
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "5"
+      UI_LABEL "Q202-MAX. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q210
+   {
+      TYPE   d
+      DEFVAL   "1"
+      UI_LABEL "Q210-DWELL TIME AT TOP"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_200
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_200"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_201
+{
+   UI_LABEL "CYCL DEF 201 REAMING"
+   CATEGORY DRILL
+   PARAM cycle_Q208
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q208-RETRACTION FEED RATE"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_201
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_201"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_202
+{
+   UI_LABEL "CYCL DEF 202 BORING"
+   CATEGORY DRILL
+   PARAM cycle_Q208
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q208-RETRACTION FEED RATE"
+   }
+   PARAM cycle_Q214
+   {
+      TYPE o
+      DEFVAL "0 without"
+      OPTIONS "0 without", "1 -MainAxis","2 -MinorAxis","3 +MainAxis","4 -MinorAxis"
+      UI_LABEL "Q214-DISENGAGING DIRECTN"
+   }
+   PARAM cycle_Q336
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q336-ANGLE OF SPINDLE"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_202
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_202"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_203
+{
+   UI_LABEL "CYCL DEF 203 UNIVERSAL DRILLING"
+   CATEGORY DRILL
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "5"
+      UI_LABEL "Q202-MAX. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q210
+   {
+      TYPE   d
+      DEFVAL   "1"
+      UI_LABEL "Q210-DWELL TIME AT TOP"
+   }
+   PARAM cycle_Q212
+   {
+      TYPE   d
+      DEFVAL   ".2"
+      UI_LABEL "Q212-DECREMENT"
+   }
+   PARAM cycle_Q213
+   {
+      TYPE   i
+      DEFVAL   "3"
+      UI_LABEL "Q213-BREAKS"
+   }
+   PARAM cycle_Q205
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q205-MIN. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q208
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q208-RETRACTION FEED RATE"
+   }
+   PARAM cycle_Q256
+   {
+      TYPE   d
+      DEFVAL   ".2"
+      UI_LABEL "Q256-DIST. FOR CHIP BRKNG"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_203
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_203"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_204
+{
+   UI_LABEL "CYCL DEF 204 BACK BORING"
+   CATEGORY DRILL
+   PARAM cycle_Q249
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q249-DEPTH OF COUNTERBORE"
+   }
+   PARAM cycle_Q250
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q250-MATERIAL THICKNESS"
+   }
+   PARAM cycle_Q251
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q251-OFF-CENTER DISTANCE"
+   }
+   PARAM cycle_Q252
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q252-TOOL EDGE HEIGHT"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q254
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q254-F COUNTERSINKING"
+   }
+   PARAM cycle_Q214
+   {
+      TYPE o
+      DEFVAL "0 without"
+       OPTIONS "0 without", "1 -MainAxis","2 -MinorAxis","3 +MainAxis","4 -MinorAxis"
+      UI_LABEL "Q214-DISENGAGING DIRECTN"
+   }
+   PARAM cycle_Q336
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q336-ANGLE OF SPINDLE"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_204
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_204"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_205
+{
+   UI_LABEL "CYCL DEF 205 UNIVERSAL PECKING"
+   CATEGORY DRILL
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "5"
+      UI_LABEL "Q202-MAX. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q212
+   {
+      TYPE   d
+      DEFVAL   ".2"
+      UI_LABEL "Q212-DECREMENT"
+   }
+   PARAM cycle_Q205
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q205-MIN. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q258
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q258-UPPER ADV. STOP DIST."
+   }
+   PARAM cycle_Q259
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q259-LOWER ADV. STOP DIST."
+   }
+   PARAM cycle_Q257
+   {
+      TYPE   d
+      DEFVAL   "6"
+      UI_LABEL "Q257-DEPTH FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q256
+   {
+      TYPE   d
+      DEFVAL   ".2"
+      UI_LABEL "Q256-DIST. FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q379
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q379-STARTING POINT"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_205
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_205"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_206
+{
+   UI_LABEL "CYCL DEF 206 TAPPING NEW"
+   CATEGORY DRILL
+   PARAM cycle_Q206
+   {
+	 TYPE d
+	 DEFVAL "150.0"
+	 UI_LABEL "Q206-Feed rate for plngng"
+   }
+   PARAM cycle_Q211
+   {
+   	 TYPE d
+   	 DEFVAL "0.25"
+   	 UI_LABEL "Q211-Dwell time at botom"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_206
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_206"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_208
+{
+   UI_LABEL "CYCL DEF 208 BORE MILLING"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q334
+   {
+      TYPE   d
+      DEFVAL   "5.0000"
+      UI_LABEL "Q334-PLUNGING DEPTH"
+   }
+   PARAM cycle_Q342
+   {
+      TYPE   d
+      DEFVAL   "6.0000"
+      UI_LABEL "Q342-ROUGHING DIAMETER"
+   }
+   PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_208
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_208"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_209
+{
+   UI_LABEL "CYCL DEF 209 TAPPING W/ CHIP BRKG"
+   CATEGORY DRILL
+   PARAM cycle_Q257
+   {
+      TYPE   d
+      DEFVAL   "6"
+      UI_LABEL "Q257-DEPTH FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q256
+   {
+      TYPE   d
+      DEFVAL   ".2"
+      UI_LABEL "Q256-DIST. FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q336
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q336-ANGLE OF SPINDLE"
+   }
+   PARAM cycle_Q403
+   {
+      TYPE   d
+      DEFVAL   "1"
+      UI_LABEL "Q403-RPM FACTOR"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_209
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_209"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_241
+{
+   UI_LABEL "CYCL DEF 241 SINGLE-LIP DEEP-HOLE"
+   CATEGORY DRILL
+   PARAM cycle_Q208
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q208-RETRACTION FEED RATE"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q379
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q379-STARTING POINT"
+   }
+   PARAM cycle_Q426
+   {
+      TYPE o
+      DEFVAL "3"
+      OPTIONS "3","4","5"
+      UI_LABEL "Q426-DIR. OF SPINDLE ROT."
+   }
+   PARAM cycle_Q427
+   {
+      TYPE i
+      DEFVAL "50"
+      UI_LABEL "Q427-ROT. SPEED INFEED/OUT"
+   }
+   PARAM cycle_Q429
+   {
+      TYPE   i
+      DEFVAL   "51"
+      UI_LABEL "Q429-COOLANT ON"
+   }
+   PARAM cycle_Q430
+   {
+      TYPE   i
+      DEFVAL   "52"
+      UI_LABEL "Q430-COOLANT OFF"
+   }
+   PARAM cycle_Q435
+   {
+      TYPE   d
+      DEFVAL   "0.0"
+      UI_LABEL "Q435-DWELL DEPTH"
+   }
+   PARAM cycle_Q401
+   {
+      TYPE   d
+      DEFVAL   "0.0"
+      UI_LABEL "Q401-FEED RATE FACTOR %"
+   }
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "0.0"
+      UI_LABEL "Q202-MAX PLUNGING DEPTH"
+   }
+   PARAM cycle_Q212
+   {
+      TYPE   d
+      DEFVAL   "0.0"
+      UI_LABEL "Q212-DECREMENT"
+   }
+   PARAM cycle_Q205
+   {
+      TYPE   d
+      DEFVAL   "0.0"
+      UI_LABEL "Q205-MIN PLUNGING DEPTH"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_241
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_241"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_252
+{
+   UI_LABEL "CYCL DEF 252 CIRCULAR POCKET"
+   CATEGORY DRILL
+   PARAM cycle_Q215
+   {
+      TYPE o
+      DEFVAL "2 Only Finish"
+      OPTIONS "0 Rough and Finish","1 Only Rough","2 Only Finish"
+      UI_LABEL "Q215-MACHINING OPERATION"
+   }
+   PARAM cycle_Q223
+   {
+      TYPE   d
+      DEFVAL   "30.0000"
+      UI_LABEL "Q223-CIRCLE DIAMETER"
+   }
+   PARAM cycle_Q368
+   {
+      TYPE   d
+      DEFVAL   "0.1"
+      UI_LABEL "Q368-ALLOWANCE FOR SIDE"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "5"
+      UI_LABEL "Q202-MAX. PLUNGING DEPTH"
+   }
+   PARAM cycle_Q369
+   {
+      TYPE   d
+      DEFVAL   "0.1"
+      UI_LABEL "Q369-ALLOWANCE FOR FLOOR"
+   }
+   PARAM cycle_Q338
+   {
+      TYPE   d
+      DEFVAL   "5"
+      UI_LABEL "Q338-INFEED FOR FINISHING"
+   }
+   PARAM cycle_Q370
+   {
+      TYPE   d
+      DEFVAL   ".7"
+      UI_LABEL "Q370-TOOL PATH OVERLAP"
+   }
+   PARAM cycle_Q366
+   {
+      TYPE o
+      DEFVAL "0 Plunge"
+      OPTIONS "0 Plunge","1 Helix"
+      UI_LABEL "Q366-PLUNGE"
+   }
+   PARAM cycle_Q385
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q385-FEED RATE FOR FINISHING"
+   }
+   PARAM cycle_Q439
+   {
+      TYPE   o
+      DEFVAL "0-TCP"
+      OPTIONS "0-TCP","1-TCP,Edge Finish Wall","2-TCP,Edge Finish Wall+Floor","3-Cutting Edge"
+      UI_LABEL "Q439-FEED RATE REFERENCE"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_252
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_252"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+
+}
+EVENT lib_event_cycle_262
+{
+   UI_LABEL "CYCL DEF 262 THREAD MILLING"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q355
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q355-THREADS PER STEP"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "750"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_262
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_262"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_263
+{
+   UI_LABEL "CYCL DEF 263 THREAD MLLNG/CNTSNKG"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q239
+   {
+      TYPE   d
+      DEFVAL   "1.0000"
+      UI_LABEL "Q239-PITCH"
+   }
+   PARAM cycle_Q356
+   {
+      TYPE   d
+      DEFVAL   "1.0000"
+      UI_LABEL "Q356-COUNTERSINKING DEPTH"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "750"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM cycle_Q357
+   {
+      TYPE   d
+      DEFVAL   "0.2"
+      UI_LABEL "Q357-CLEARANCE TO SIDE"
+   }
+   PARAM cycle_Q358
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q358-DEPTH AT FRONT"
+   }
+   PARAM cycle_Q359
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q359-OFFSET AT FRONT"
+   }
+   PARAM cycle_Q254
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q254-F COUNTERSINKING"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_263
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_263"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_264
+{
+   UI_LABEL "CYCL DEF 264 THREAD DRILLNG/MLLNG"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q356
+   {
+      TYPE   d
+      DEFVAL   "1.0000"
+      UI_LABEL "Q356-COUNTERSINKING DEPTH"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "750"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM cycle_Q202
+   {
+      TYPE   d
+      DEFVAL   "3"
+      UI_LABEL "Q202-PLUNGING DEPTH"
+   }
+   PARAM cycle_Q258
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q258-UPPER ADV. STOP DIST."
+   }
+   PARAM cycle_Q257
+   {
+      TYPE   d
+      DEFVAL   "6"
+      UI_LABEL "Q257-DEPTH FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q256
+   {
+      TYPE   d
+      DEFVAL   "0.2"
+      UI_LABEL "Q256-DIST. FOR CHIP BRKNG"
+   }
+   PARAM cycle_Q358
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q358-DEPTH AT FRONT"
+   }
+   PARAM cycle_Q359
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q359-OFFSET AT FRONT"
+   }
+   PARAM cycle_Q206
+   {
+      TYPE   i
+      DEFVAL   "60"
+      UI_LABEL "Q206-FEED RATE FOR PLNGNG"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_264
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_264"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_265
+{
+   UI_LABEL "CYCL DEF 265 HEL. THREAD DRLG/MLG"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "750"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q358
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q358-DEPTH AT FRONT"
+   }
+   PARAM cycle_Q359
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q359-OFFSET AT FRONT"
+   }
+   PARAM cycle_Q360
+   {
+      TYPE o
+      DEFVAL "0 before Tap"
+      OPTIONS "0 before Tap","1 after Tap"
+      UI_LABEL "Q360-COUNTERSINK"
+   }
+   PARAM cycle_Q254
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q254-F COUNTERSINKING"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_265
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_265"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_267
+{
+   UI_LABEL "CYCL DEF 267 OUTSIDE THREAD MLLNG"
+   CATEGORY DRILL
+   PARAM cycle_Q335
+   {
+      TYPE   d
+      DEFVAL   "12.0000"
+      UI_LABEL "Q335-NOMINAL DIAMETER"
+   }
+   PARAM cycle_Q355
+   {
+      TYPE   i
+      DEFVAL   "1"
+      UI_LABEL "Q355-THREADS PER STEP"
+   }
+   PARAM cycle_Q253
+   {
+      TYPE   i
+      DEFVAL   "0"
+      UI_LABEL "Q253-F PRE-POSITIONING"
+   }
+   PARAM cycle_Q351
+   {
+      TYPE o
+      DEFVAL "+1"
+      OPTIONS "+1","-1"
+      UI_LABEL "Q351-CLIMB OR UP-CUT"
+   }
+   PARAM cycle_Q358
+   {
+      TYPE   d
+      DEFVAL   "0.5"
+      UI_LABEL "Q358-DEPTH AT FRONT"
+   }
+   PARAM cycle_Q359
+   {
+      TYPE   d
+      DEFVAL   "2"
+      UI_LABEL "Q359-OFFSET AT FRONT"
+   }
+   PARAM cycle_Q254
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q254-F COUNTERSINKING"
+   }
+   PARAM cycle_Q207
+   {
+      TYPE   i
+      DEFVAL   "120"
+      UI_LABEL "Q207-FEED RATE FOR MILLING"
+   }
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_CYCL_DEF_267
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_cycl_def_267"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+}
+
+EVENT lib_event_cycle_417
+{
+	UI_LABEL "TCH PROBE 417 DATUM IN TS AXIS"
+   	PARAM cycle_Q320
+   	{
+      		TYPE   d
+      		DEFVAL "5.0000"
+      		UI_LABEL "Q320-SETUP CLEARANCE"
+   	}
+
+   	PARAM cycle_Q260
+   	{
+      		TYPE   d
+      		DEFVAL "100.0000"
+      		UI_LABEL "Q260-CLEARANCE HEIGHT"
+   	}
+
+	PARAM cycle_Q305
+   	{
+      		TYPE   i
+      		DEFVAL "0"
+      		UI_LABEL "Q305-NO. IN TABLE"
+   	}
+
+   	PARAM cycle_Q333
+   	{
+      		TYPE   d
+      		DEFVAL "0.0000"
+      		UI_LABEL "Q333-DATUM"
+   	}
+
+   	PARAM cycle_Q303
+	{
+		TYPE   o
+      		DEFVAL "1"
+      		OPTIONS "-1","0","1"
+      		UI_LABEL "Q303-MEAS. VALUE TRANSFER"
+	}
+
+    PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_itnc530_TCH_PROBE_417
+   {
+      TYPE l
+      DEFVAL "ctrl_itnc530_tch_probe_417"
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+
+}
+
+EVENT lib_event_cycle_800
+{
+	UI_LABEL "CYCL DEF 800 ADAPT ROTARY COORDINATE SYSTEM"
+	CATEGORY LATHE
+   	PARAM cycle_Q497
+   	{
+      		TYPE   d
+      		DEFVAL "0.0000"
+      		UI_LABEL "Q497-PRECESSION ANGLE"
+   	}
+   	PARAM spec_params
+   	{
+   		TYPE g
+   		TOGGLE Off
+   		DEFVAL "start_closed"
+   		UI_LABEL "Specify additional parameters"
+   	}
+   	PARAM cycle_Q530
+   	{
+      		TYPE   o
+      		DEFVAL "0"
+      		OPTIONS "0","1","2","3"
+      		UI_LABEL "Q530-INCLINED MACHINING"
+   	}
+   	PARAM cycle_Q532
+   	{
+      		TYPE   s
+      		DEFVAL "MAX"
+      		UI_LABEL "Q532-FEED RATE"
+   	}
+   	PARAM cycle_Q533
+   	{
+      		TYPE   o
+      		DEFVAL "0"
+      		OPTIONS "-2","-1","0","1","2"
+      		UI_LABEL "Q533-PREFERRED DIRECTION"
+   	}
+   	PARAM spec_params_end
+   	{
+   		TYPE g
+   		DEFVAL "end"
+   	}
+   	PARAM excentric_group
+   	{
+   		TYPE g
+   		DEFVAL "start_closed"
+   		UI_LABEL "ECCENTRIC TURNING"
+   	}
+   	PARAM cycle_Q535
+   	{
+      		TYPE   o
+      		DEFVAL "0"
+      		OPTIONS "0","1","2","3"
+      		UI_LABEL "Q535-ECCENTRIC TURNING"
+   	}
+   	PARAM cycle_Q536
+   	{
+      		TYPE   o
+      		DEFVAL "0"
+      		OPTIONS "0","1"
+      		UI_LABEL "Q536-ECCENTRIC TURNING WITHOUT STOP"
+   	}
+   	PARAM excentric_group_end
+   	{
+   		TYPE g
+   		DEFVAL "end"
+   	}
+   PARAM legend_group
+   {
+      TYPE g
+      DEFVAL "start_closed"
+      UI_LABEL "Legend"
+   }
+   PARAM ctrl_tnc640_CYCL_DEF_800
+   {
+      TYPE l
+   }
+   PARAM legend_group_end
+   {
+      TYPE g
+      DEFVAL "end"
+   }
+
+}
+

@@ -1,0 +1,4898 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#=============================================================================================
+# DATE         NAME                  DESCRIPTION OF CHANGE
+# ----         ----                  ---------------------
+# 28-May-2020  XY                    Added version history; Changed BLOCK_TEMPLATE external_subprogram
+# 12-Jun-2020  XY                    Changed BLOCK_TEMPLATE end_of_subprogram
+# 03-Jul-2020  Li Li                 Update CYCL_205
+# 04-Aug-2020  Li Li                 Reset sequence number
+# $HISTORY$
+#############################################################################################
+
+MACHINE HEIDENHAIN
+
+FORMATTING
+{
+  WORD_SEPARATOR " "
+  END_OF_LINE ""
+  SEQUENCE sequence_number 1  1 1 99999
+
+################ FORMAT DECLARATIONS #################
+  FORMAT AbsCoord "&__5.3_"
+  FORMAT AbsCoord_IN "&__5.4_"
+  FORMAT Coordinate "&_01.4_"
+  FORMAT Coordinate_IN "&_01.4_"
+  FORMAT Coordinate_1 "&+_5.4_"
+  FORMAT Digit_2 "&__2_00"
+  FORMAT Digit_3 "&__3_00"
+  FORMAT Digit_4 "&_04_00"
+  FORMAT Digit_5 "&__5_00"
+  FORMAT Dwell_SECONDS "&__5.3_"
+  FORMAT Dwell_sec "&__5.3_"
+  FORMAT EventNum "&+03_00"
+  FORMAT Feed "&_01.2_"
+  FORMAT Feed_DPM "&__5.2_"
+  FORMAT Feed_FRN "&__5.3_"
+  FORMAT Feed_INV "&__5.3_"
+  FORMAT Feed_IPM "&__4.1_"
+  FORMAT Feed_IPR "&_01.4_"
+  FORMAT Feed_MMPM "&__5.0_"
+  FORMAT Feed_MMPR "&_01.3_"
+  FORMAT Hcode "&_02_00"
+  FORMAT Rev "&__4_00"
+  FORMAT Rotary "&__5.3_"
+  FORMAT String_2 "%s"
+  FORMAT Tcode "&__2_00"
+  FORMAT Zero_int "&_01_0_"
+  FORMAT Zero_real "&_01.0_"
+  FORMAT plane_angle "&__5.4_"
+  FORMAT tolerance "&_01.3_"
+  FORMAT vector "&__1.7_"
+  FORMAT String "%s"
+  FORMAT String_Cycle "%s"
+
+
+################ ADDRESS DECLARATIONS ################
+  ADDRESS header_program
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "0 BEGIN PGM "
+      TRAILER     [ $::mom_user_output_unit]
+  }
+
+  ADDRESS header_subprogram
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "BEGIN PGM "
+      TRAILER     [ $::mom_user_output_unit]
+  }
+
+  ADDRESS trailer_program
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "END PGM "
+      TRAILER     [ $::mom_user_output_unit]
+  }
+
+  ADDRESS trailer_subprogram
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "END PGM "
+      TRAILER     [ $::mom_user_output_unit]
+  }
+
+  ADDRESS CALL
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "CALL PGM "
+      TRAILER     ""
+  }
+
+  ADDRESS G_plane
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      LEADER      "G"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS G_motion
+  {
+      FORMAT      String_2
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS G
+  {
+      FORMAT      String_2
+      FORCE       off
+      LEADER      ""
+  }
+
+  ADDRESS G_unit
+  {
+      FORMAT      String_2
+      FORCE       off
+      LEADER      ""
+  }
+
+  ADDRESS X_home
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      ZERO_FORMAT Zero_real
+      LEADER      "X"
+  }
+
+  ADDRESS A
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      LEADER      [A]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS B
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      LEADER      [B]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS C
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      LEADER      [C]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS X
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(X)]
+      TRAILER     [$mom_sys_trailer(X)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Y_home
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      ZERO_FORMAT Zero_real
+      LEADER      "Y"
+  }
+
+  ADDRESS Y
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(Y)]
+      TRAILER     [$mom_sys_trailer(Y)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Z_home
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         -99999.999 Truncate
+      ZERO_FORMAT Zero_real
+      LEADER      "Z"
+  }
+
+  ADDRESS Z
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      [$mom_sys_leader(Z)]
+      TRAILER     [$mom_sys_trailer(Z)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS fourth_axis
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.9999 Abort
+      MIN         -99999.9999 Abort
+      LEADER      [$mom_sys_leader(fourth_axis)]
+      TRAILER     [$mom_sys_trailer(fourth_axis)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS fifth_axis
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(fifth_axis)]
+      TRAILER     [$mom_sys_trailer(fifth_axis)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS sixth_axis
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      [$mom_sys_leader(sixth_axis)]
+      TRAILER     [$mom_sys_trailer(sixth_axis)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS function_mode
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      "FUNCTION MODE "
+  }
+
+  ADDRESS I
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "X"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS J
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "Y"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS K
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "Z"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS R
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "R"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS X_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "TX"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Y_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "TY"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Z_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "TZ"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS NX_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "NX"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS NY_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "NY"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS NZ_vector
+  {
+      FORMAT      vector
+      FORCE       always
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "NZ"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS M128
+  {
+      FORMAT      AbsCoord
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS M130
+  {
+      FORMAT      Digit_3
+      FORCE       always
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS T
+  {
+      FORMAT      Tcode
+      FORCE       always
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      ""
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS T_name
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      [$lib_linked_var(CONF_CTRL_setting@header_trailer_char)]
+      TRAILER     [$lib_linked_var(CONF_CTRL_setting@header_trailer_char)]
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS S
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "S"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS F_tool_call
+  {
+      FORMAT      Feed
+      FORCE       off
+      MAX         999999.9999 Truncate
+      MIN         0.0001 Truncate
+      LEADER      "F"
+  }
+
+  ADDRESS DL_tool_call
+  {
+      FORMAT      Coordinate_1
+      FORCE       off
+      MAX         99999 Truncate
+      MIN         0 Truncate
+      LEADER      "DL"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS DR_tool_call
+  {
+      FORMAT      Coordinate_1
+      FORCE       always
+      MAX         99999 Truncate
+      MIN         -99999 Truncate
+      LEADER      "DR"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS D
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      MAX         99 Truncate
+      MIN         0 Truncate
+      LEADER      "D"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS H
+  {
+      FORMAT      Hcode
+      FORCE       off
+      MAX         99 Truncate
+      MIN         0 Truncate
+      LEADER      "H"
+  }
+
+  ADDRESS dwell
+  {
+      FORMAT      Dwell_sec
+      FORCE       always
+      MAX         99999.999 Truncate
+      MIN         0.001 Truncate
+      LEADER      [CYCL DEF 9.1 $lib_linked_var(LIB_GE_MSG_CTR@DWELL)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS cycle_dwell
+  {
+      FORMAT      Dwell_sec
+      FORCE       off
+      MAX         99999.999 Truncate
+      MIN         0.001 Truncate
+      LEADER      "Q211="
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS P_cutcom
+  {
+      FORMAT      Dwell_sec
+      FORCE       off
+      MAX         99999.999 Truncate
+      MIN         0.001 Truncate
+      LEADER      "P"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS K_cycle
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "K"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS cycle_step1
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "I"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS cycle_step
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "Q"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS Q_cutcom
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         9999.9999 Abort
+      MIN         -9999.9999 Abort
+      LEADER      "Q"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS E
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      MAX         99999.999 Abort
+      MIN         -99999.999 Abort
+      LEADER      "E"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS M_axisopt
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+  ADDRESS M_range
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M
+  {
+      FORMAT      Digit_2
+      FORCE       always
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS helix_angle
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      "IPA"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS helix_height
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      [$mom_sys_leader(helix_height)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS cutter_comp
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      ""
+  }
+
+  ADDRESS G_cutcom
+  {
+      FORMAT      String_2
+      FORCE       off
+      LEADER      ""
+  }
+
+  ADDRESS circle_direction
+  {
+      FORMAT      String
+      LEADER      ""
+  }
+
+  ADDRESS F
+  {
+      FORMAT      Feed
+      FORCE       off
+      MAX         999999.9999 Truncate
+      MIN         0.0001 Truncate
+      LEADER      "F"
+  }
+
+  ADDRESS F_mode
+  {
+      FORMAT      Digit_3
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS TL
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      "L"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS TR
+  {
+      FORMAT      Coordinate
+      FORCE       off
+      LEADER      "R"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS local_zero
+  {
+      FORMAT      Digit_2
+      FORCE       always
+      MAX         999 Truncate
+      MIN         0 Truncate
+      LEADER      "CYCL DEF 7.1 #"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS main_zero
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      MAX         999 Truncate
+      MIN         0 Truncate
+      LEADER      [CYCL DEF 247 $lib_linked_var(LIB_GE_MSG_CTR@DATUM SETTING) Q339=]
+      TRAILER     [ ; $lib_linked_var(LIB_GE_MSG_CTR@DATUM NUMBER)]
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS MB
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "MB "
+  }
+
+  ADDRESS F_param
+  {
+      FORMAT      String
+      FORCE       off
+      LEADER      [$feed_linear_leader]
+  }
+
+  ADDRESS FMAX
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      [$lib_linked_var(CONF_CTRL_feed@feed_max)]
+  }
+
+  ADDRESS M_clamp_fifth
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M_clamp_fourth
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M_coolant
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      MAX         99 Truncate
+      MIN         0 Truncate
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M_spindle
+  {
+      FORMAT      Digit_2
+      FORCE       off
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS M_gohome
+  {
+      FORMAT      Digit_2
+      FORCE       always
+      LEADER      "M"
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS N
+  {
+      FORMAT      Digit_5
+      FORCE       off
+      MAX         99999 Truncate
+      LEADER      [$mom_sys_leader(N)]
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS Text
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS Tooldirection
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS plane_angle_a
+  {
+      FORMAT      plane_angle
+      FORCE       always
+      LEADER      [$lib_linked_var(CONF_ITNC530_PLANE@a_leader)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS plane_angle_b
+  {
+      FORMAT      plane_angle
+      FORCE       always
+      LEADER      [$lib_linked_var(CONF_ITNC530_PLANE@b_leader)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS plane_angle_c
+  {
+      FORMAT      plane_angle
+      FORCE       always
+      LEADER      [$lib_linked_var(CONF_ITNC530_PLANE@c_leader)]
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS plane_motion
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS plane_dist
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      LEADER      "ABST"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS plane_feed
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "F"
+  }
+
+  ADDRESS plane_seq
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "SEQ"
+  }
+
+  ADDRESS plane_rot
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS SPOS
+  {
+      FORMAT      Coordinate
+      FORCE       always
+      MAX         360 Truncate
+      MIN         0 Truncate
+      LEADER      "ANGLE"
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS HSCMODE
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "HSC-MODE:"
+  }
+
+  ADDRESS TOL
+  {
+      FORMAT      tolerance
+      FORCE       always
+      MAX         10.0 Truncate
+      MIN         0.0 Truncate
+      LEADER      "T"
+  }
+
+  ADDRESS TATOL
+  {
+      FORMAT      tolerance
+      FORCE       always
+      MAX         10.0 Truncate
+      MIN         0.0 Truncate
+      LEADER      "TA"
+  }
+
+################ ADDRESS DECLARATIONS ################
+  ADDRESS LF_AAXIS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_ENUM
+  {
+      FORMAT      Digit_5
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS LF_BAXIS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_XABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_FEED
+  {
+      FORMAT      Feed
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS LF_YABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+  ADDRESS LF_SPEED
+  {
+      FORMAT      Rev
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_int
+  }
+
+  ADDRESS LF_ZABS
+  {
+      FORMAT      AbsCoord
+      FORCE       always
+      LEADER      ""
+      ZERO_FORMAT Zero_real
+  }
+
+################ CYCLE ADDRESS DECLARATIONS ################
+
+  ADDRESS cycle_call
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "CYCL DEF "
+      TRAILER     " "
+  }
+
+  ADDRESS cycle_comment
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ""
+  }
+
+  ADDRESS cycle_seperator
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      "~"
+  }
+
+  ADDRESS cycle_description
+  {
+      FORMAT      String
+      FORCE       always
+      LEADER      ";"
+  }
+
+  ADDRESS Q1
+  {
+      # MILLING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q1="
+  }
+
+  ADDRESS Q2
+  {
+      # TOOL PATH OVERLAP
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q2="
+  }
+
+  ADDRESS Q3
+  {
+      # ALLOWANCE FOR SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q3="
+  }
+
+  ADDRESS Q4
+  {
+      # ALLOWANCE FOR FLOOR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q4="
+  }
+
+  ADDRESS Q5
+  {
+      # SURFACE COORDINATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q5="
+  }
+
+  ADDRESS Q6
+  {
+      # SET-UP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q6="
+  }
+
+  ADDRESS Q7
+  {
+      # CLEARANCE HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q7="
+  }
+
+  ADDRESS Q8
+  {
+      # ROUNDING RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q8="
+  }
+
+  ADDRESS Q9
+  {
+      # DIRECTION OF ROTATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q9="
+  }
+
+  ADDRESS Q10
+  {
+      # PLUNGING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q10="
+  }
+
+  ADDRESS Q11
+  {
+      # FEED RATE FOR PLNGNG
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q11="
+  }
+
+  ADDRESS Q12
+  {
+      # FEED RATE FOR MILLING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q12="
+  }
+
+  ADDRESS Q13
+  {
+      # ROUGH-OUT TOOL
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q13="
+  }
+
+  ADDRESS Q14
+  {
+      # ALLOWANCE FOR SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q14="
+  }
+
+  ADDRESS Q15
+  {
+      # CLIMB OR UP-CUT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q15="
+  }
+
+  ADDRESS Q16
+  {
+      # RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q16="
+  }
+
+  ADDRESS Q17
+  {
+      # DIMENSION TYPE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q17="
+  }
+
+  ADDRESS Q18
+  {
+      # COARSE ROUGHING TOOL
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q18="
+  }
+
+  ADDRESS Q19
+  {
+      # RECIPROCATION FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q19="
+  }
+
+  ADDRESS Q20
+  {
+      # SLOT WIDTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q20="
+  }
+
+  ADDRESS Q21
+  {
+      # TOLERANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q21="
+  }
+
+  ADDRESS Q200
+  {
+      # SETUP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q200="
+  }
+
+  ADDRESS Q201
+  {
+      # DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q201="
+  }
+
+  ADDRESS Q202
+  {
+      # PLUNGING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q202="
+  }
+
+  ADDRESS Q203
+  {
+      # SURFACE COORDINATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q203="
+  }
+
+  ADDRESS Q204
+  {
+      # 2ND SETUP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q204="
+  }
+
+  ADDRESS Q205
+  {
+      # MIN. PLUNGING DEPTH PLUNGING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q205="
+  }
+
+  ADDRESS Q206
+  {
+      # FEED RATE FOR PLUNGING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q206="
+  }
+
+  ADDRESS Q207
+  {
+      # FEED RATE FOR MILLING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q207="
+  }
+
+  ADDRESS Q208
+  {
+      # RETRACTION FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q208="
+  }
+
+  ADDRESS Q210
+  {
+      # DWELL TIME AT TOP
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q210="
+  }
+
+  ADDRESS Q211
+  {
+      # DWELL TIME AT DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q211="
+  }
+
+  ADDRESS Q212
+  {
+      # DECREMENT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q212="
+  }
+
+  ADDRESS Q213
+  {
+      # CHIP BREAKING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q213="
+  }
+
+  ADDRESS Q214
+  {
+      # DISENGAGING DIRECTN
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q214="
+  }
+
+  ADDRESS Q215
+  {
+      # MACHINING OPERATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q215="
+  }
+
+  ADDRESS Q216
+  {
+      # CENTER IN 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q216="
+  }
+
+  ADDRESS Q217
+  {
+      # CENTER IN 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q217="
+  }
+
+  ADDRESS Q218
+  {
+      # 1ST SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q218="
+  }
+
+  ADDRESS Q219
+  {
+      # 2ND SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q219="
+  }
+
+  ADDRESS Q220
+  {
+      # RADIUS/CHAMFER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q220="
+  }
+
+  ADDRESS Q221
+  {
+      # SURFACE OVERSIZE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q221="
+  }
+
+  ADDRESS Q222
+  {
+      # WORKPIECE BLANK DIA.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q222="
+  }
+
+  ADDRESS Q223
+  {
+      # CIRCLE DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q223="
+  }
+
+  ADDRESS Q224
+  {
+      # ANGLE OF ROTATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q224="
+  }
+
+  ADDRESS Q225
+  {
+      # STARTNG PNT 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q225="
+  }
+
+  ADDRESS Q226
+  {
+      # STARTNG PNT 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q226="
+  }
+
+  ADDRESS Q227
+  {
+      # STARTNG PNT 3RD AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q227="
+  }
+
+  ADDRESS Q237
+  {
+      # SPACING IN 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q237="
+  }
+
+  ADDRESS Q238
+  {
+      # SPACING IN 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q238="
+  }
+
+  ADDRESS Q239
+  {
+      # THREAD PITCH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q239="
+  }
+
+  ADDRESS Q241
+  {
+      # NR OF REPETITIONS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q241="
+  }
+
+  ADDRESS Q242
+  {
+      # NUMBER OF COLUMNS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q242="
+  }
+
+  ADDRESS Q243
+  {
+      # NUMBER OF LINES
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q243="
+  }
+
+  ADDRESS Q244
+  {
+      # PITCH CIRCLE DIA.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q244="
+  }
+
+  ADDRESS Q245
+  {
+      # STARTING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q245="
+  }
+
+  ADDRESS Q246
+  {
+      # STOPPING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q246="
+  }
+
+  ADDRESS Q247
+  {
+      # STEPPING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q247="
+  }
+
+  ADDRESS Q248
+  {
+      # ANGULAR LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q248="
+  }
+
+  ADDRESS Q249
+  {
+      # DEPTH OF COUNTERBORE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q249="
+  }
+
+  ADDRESS Q250
+  {
+      # MATERIAL THICKNESS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q250="
+  }
+
+  ADDRESS Q251
+  {
+      # OFF-CENTER DISTANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q251="
+  }
+
+  ADDRESS Q252
+  {
+      # TOOL EDGE HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q252="
+  }
+
+  ADDRESS Q253
+  {
+      # F PRE-POSITIONING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q253="
+  }
+
+  ADDRESS Q254
+  {
+      # F COUNTERBORING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q254="
+  }
+
+  ADDRESS Q255
+  {
+      # DWELL TIME
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q255="
+  }
+
+  ADDRESS Q256
+  {
+      # DIST. FOR CHIP BRKNG
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q256="
+  }
+
+  ADDRESS Q257
+  {
+      # DEPTH FOR CHIP BRKNG
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q257="
+  }
+
+  ADDRESS Q258
+  {
+      # ADV. STOP DIST.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q258="
+  }
+
+  ADDRESS Q259
+  {
+      # LOWER ADV. STOP DIST.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q259="
+  }
+
+  ADDRESS Q260
+  {
+      # CLEARANCE HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q260="
+  }
+
+  ADDRESS Q261
+  {
+      # MEASURING HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q261="
+  }
+
+  ADDRESS Q262
+  {
+      # NOMINAL DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q262="
+  }
+
+  ADDRESS Q263
+  {
+      # 1ST POINT 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q263="
+  }
+
+  ADDRESS Q264
+  {
+      # 1ST POINT 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q264="
+  }
+
+  ADDRESS Q265
+  {
+      # 2ND POINT 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q265="
+  }
+
+  ADDRESS Q266
+  {
+      # 2ND POINT 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q266="
+  }
+
+  ADDRESS Q267
+  {
+      # TRAVERSE DIRECTION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q267="
+  }
+
+  ADDRESS Q268
+  {
+      # 1ST CENTER 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q268="
+  }
+
+  ADDRESS Q269
+  {
+      # 1ST CENTER 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q269="
+  }
+
+  ADDRESS Q270
+  {
+      # 2ND CENTER 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q270="
+  }
+
+  ADDRESS Q271
+  {
+      # 2ND CENTER 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q271="
+  }
+
+  ADDRESS Q272
+  {
+      # MEASURING AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q272="
+  }
+
+  ADDRESS Q273
+  {
+      # CENTER IN 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q273="
+  }
+
+  ADDRESS Q274
+  {
+      # CENTER IN 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q274="
+  }
+
+  ADDRESS Q275
+  {
+      # MAXIMUM DIMENSION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q275="
+  }
+
+  ADDRESS Q276
+  {
+      # MINIMUM DIMENSION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q276="
+  }
+
+  ADDRESS Q279
+  {
+      # TOLERANCE 1ST CENTER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q279="
+  }
+
+  ADDRESS Q280
+  {
+      # TOLERANCE 2ND CENTER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q280="
+  }
+
+  ADDRESS Q281
+  {
+      # MEASURING LOG
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q281="
+  }
+
+  ADDRESS Q282
+  {
+      # FIRST SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q282="
+  }
+
+  ADDRESS Q283
+  {
+      # 2ND SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q283="
+  }
+
+  ADDRESS Q284
+  {
+      # MAX. LIMIT 1ST SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q284="
+  }
+
+  ADDRESS Q285
+  {
+      # MIN. LIMIT 1ST SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q285="
+  }
+
+  ADDRESS Q286
+  {
+      # MAX. LIMIT 2ND SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q286="
+  }
+
+  ADDRESS Q287
+  {
+      # MIN. LIMIT 2ND SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q287="
+  }
+
+  ADDRESS Q288
+  {
+      # MAXIMUM DIMENSION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q288="
+  }
+
+  ADDRESS Q289
+  {
+      # MINIMUM DIMENSION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q289="
+  }
+
+  ADDRESS Q291
+  {
+      # ANGLE OF 1ST HOLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q291="
+  }
+
+  ADDRESS Q292
+  {
+      # ANGLE OF 2ND HOLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q292="
+  }
+
+  ADDRESS Q293
+  {
+      # ANGLE OF 3RD HOLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q293="
+  }
+
+  ADDRESS Q294
+  {
+      # 1ST POINT 3RD AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q294="
+  }
+
+  ADDRESS Q295
+  {
+      # 2ND POINT 3RD AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q295="
+  }
+
+  ADDRESS Q296
+  {
+      # 3RD POINT 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q296="
+  }
+
+  ADDRESS Q297
+  {
+      # 3RD POINT 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q297="
+  }
+
+  ADDRESS Q298
+  {
+      # 3RD POINT 3RD AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q298="
+  }
+
+  ADDRESS Q301
+  {
+      # MOVE TO CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q301="
+  }
+
+  ADDRESS Q303
+  {
+      # MEAS. VALUE TRANSFER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q303="
+  }
+
+  ADDRESS Q304
+  {
+      # BASIC ROTATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q304="
+  }
+
+  ADDRESS Q305
+  {
+      # NO. IN TABLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q305="
+  }
+
+  ADDRESS Q307
+  {
+      # PRESET ROT. ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q307="
+  }
+
+  ADDRESS Q309
+  {
+      # PGM STOP IF ERROR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q309="
+  }
+
+  ADDRESS Q310
+  {
+      # OFFS. 2ND MEASUREMNT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q310="
+  }
+
+  ADDRESS Q311
+  {
+      # NOMINAL LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q311="
+  }
+
+  ADDRESS Q312
+  {
+      # COMPENSATION AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q312="
+  }
+
+  ADDRESS Q313
+  {
+      # DIAMETER OF STUD 1
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q313="
+  }
+
+  ADDRESS Q314
+  {
+      # DIAMETER OF STUD 2
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q314="
+  }
+
+  ADDRESS Q315
+  {
+      # MEASURING HEIGHT 2
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q315="
+  }
+
+  ADDRESS Q316
+  {
+      # 3RD CENTER 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q316="
+  }
+
+  ADDRESS Q317
+  {
+      # 3RD CENTER 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q317="
+  }
+
+  ADDRESS Q318
+  {
+      # 4TH CENTER 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q318="
+  }
+
+  ADDRESS Q319
+  {
+      # 4TH CENTER 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q319="
+  }
+
+  ADDRESS Q320
+  {
+      # SET-UP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q320="
+  }
+
+  ADDRESS Q321
+  {
+      # CENTER 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q321="
+  }
+
+  ADDRESS Q322
+  {
+      # CENTER 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q322="
+  }
+
+  ADDRESS Q323
+  {
+      # FIRST SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q323="
+  }
+
+  ADDRESS Q324
+  {
+      # 2ND SIDE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q324="
+  }
+
+  ADDRESS Q325
+  {
+      # STARTING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q325="
+  }
+
+  ADDRESS Q326
+  {
+      # SPACING IN 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q326="
+  }
+
+  ADDRESS Q327
+  {
+      # SPACING IN 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q327="
+  }
+
+  ADDRESS Q328
+  {
+      # STARTNG PNT 1ST AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q328="
+  }
+
+  ADDRESS Q329
+  {
+      # STARTNG PNT 2ND AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q329="
+  }
+
+  ADDRESS Q330
+  {
+      # TOOL NUMBER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q330="
+  }
+
+  ADDRESS Q331
+  {
+      # DATUM
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q331="
+  }
+
+  ADDRESS Q332
+  {
+      # DATUM
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q332="
+  }
+
+  ADDRESS Q333
+  {
+      # DATUM
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q333="
+  }
+
+  ADDRESS Q334
+  {
+      # PLUNGING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q334="
+  }
+
+  ADDRESS Q335
+  {
+      # NOMINAL DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q335="
+  }
+
+  ADDRESS Q336
+  {
+      # ANGLE OF SPINDLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q336="
+  }
+
+  ADDRESS Q337
+  {
+      # ZERO RESET
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q337="
+  }
+
+  ADDRESS Q338
+  {
+      # INFEED FOR FINISHING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q338="
+  }
+
+  ADDRESS Q339
+  {
+      # DATUM NUMBER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q339="
+  }
+
+  ADDRESS Q340
+  {
+      # CHECK
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q340="
+  }
+
+  ADDRESS Q341
+  {
+      # PROBING THE TEETH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q341="
+  }
+
+  ADDRESS Q342
+  {
+      # ROUGHING DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q342="
+  }
+
+  ADDRESS Q343
+  {
+      # SELECT DIA./DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q343="
+  }
+
+  ADDRESS Q344
+  {
+      # DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q344="
+  }
+
+  ADDRESS Q347
+  {
+      # 1ST LIMIT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q347="
+  }
+
+  ADDRESS Q348
+  {
+      # 2ND LIMIT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q348="
+  }
+
+  ADDRESS Q349
+  {
+      # 3RD LIMIT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q349="
+  }
+
+  ADDRESS Q350
+  {
+      # MILLING DIRECTION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q350="
+  }
+
+  ADDRESS Q351
+  {
+      # MILLING TYPE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q351="
+  }
+
+  ADDRESS Q355
+  {
+      # THREADS PER STEP
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q355="
+  }
+
+  ADDRESS Q356
+  {
+      # TOTAL HOLE DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q356="
+  }
+
+  ADDRESS Q357
+  {
+      # CLEARANCE TO SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q357="
+  }
+
+  ADDRESS Q358
+  {
+      # DEPTH AT FRONT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q358="
+  }
+
+  ADDRESS Q359
+  {
+      # OFFSET AT FRONT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q359="
+  }
+
+  ADDRESS Q360
+  {
+      # COUNTERSINKING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q360="
+  }
+
+  ADDRESS Q365
+  {
+      # TYPE OF TRAVERSE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q365="
+  }
+
+  ADDRESS Q366
+  {
+      # PLUNGE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q366="
+  }
+
+  ADDRESS Q367
+  {
+      # REF. SLOT POSITION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q367="
+  }
+
+  ADDRESS Q368
+  {
+      # FINISHING ALLOWANCE FOR SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q368="
+  }
+
+  ADDRESS Q369
+  {
+      # ALLOWANCE OF THE FLOOR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q369="
+  }
+
+  ADDRESS Q370
+  {
+      # TOOL PATH OVERLAP
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q370="
+  }
+
+  ADDRESS Q374
+  {
+      # ANGLE OF ROTATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q374="
+  }
+
+  ADDRESS Q375
+  {
+      # PITCH CIRCLE DIA.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q375="
+  }
+
+  ADDRESS Q376
+  {
+      # STARTING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q376="
+  }
+
+  ADDRESS Q377
+  {
+      # NR OF REPETITIONS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q377="
+  }
+
+  ADDRESS Q378
+  {
+      # STEPPING ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q378="
+  }
+
+  ADDRESS Q379
+  {
+      # START POINT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q379="
+  }
+
+  ADDRESS Q380
+  {
+      # REFERENCE ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q380="
+  }
+
+  ADDRESS Q381
+  {
+      # PROBE IN TS AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q381="
+  }
+
+  ADDRESS Q382
+  {
+      # 1ST CO. FOR TS AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q382="
+  }
+
+  ADDRESS Q383
+  {
+      # 2ND CO. FOR TS AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q383="
+  }
+
+  ADDRESS Q384
+  {
+      # 3RD CO. FOR TS AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q384="
+  }
+
+  ADDRESS Q385
+  {
+      # FINISHING FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q385="
+  }
+
+  ADDRESS Q386
+  {
+      # END POINT 3RD AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q386="
+  }
+
+  ADDRESS Q389
+  {
+      # MILLING STRATEGY
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q389="
+  }
+
+  ADDRESS Q390
+  {
+      # TYPE OF APPROACH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q390="
+  }
+
+  ADDRESS Q391
+  {
+      # RADIUS COMPENSATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q391="
+  }
+
+  ADDRESS Q392
+  {
+      # RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q392="
+  }
+
+  ADDRESS Q393
+  {
+      # CENTER ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q393="
+  }
+
+  ADDRESS Q394
+  {
+      # DISTANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q394="
+  }
+
+  ADDRESS Q395
+  {
+      # DEPTH REFERENCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q395="
+  }
+
+  ADDRESS Q401
+  {
+      # FEED RATE FACTOR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q401="
+  }
+
+  ADDRESS Q402
+  {
+      # COMPENSATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q402="
+  }
+
+  ADDRESS Q403
+  {
+      # RPM FACTOR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q403="
+  }
+
+  ADDRESS Q404
+  {
+      # FINE ROUGH STRATEGY
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q404="
+  }
+
+  ADDRESS Q405
+  {
+      # DATUM
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q405="
+  }
+
+  ADDRESS Q406
+  {
+      # MODE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q406="
+  }
+
+  ADDRESS Q407
+  {
+      # SPHERE RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q407="
+  }
+
+  ADDRESS Q408
+  {
+      # RETR. HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q408="
+  }
+
+  ADDRESS Q409
+  {
+      # MEMORY DESIGNATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q409="
+  }
+
+  ADDRESS Q410
+  {
+      # MODE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q410="
+  }
+
+  ADDRESS Q411
+  {
+      # START ANGLE A AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q411="
+  }
+
+  ADDRESS Q412
+  {
+      # END ANGLE A AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q412="
+  }
+
+  ADDRESS Q413
+  {
+      # INCID. ANGLE A AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q413="
+  }
+
+  ADDRESS Q414
+  {
+      # MEAS. POINTS A AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q414="
+  }
+
+  ADDRESS Q415
+  {
+      # START ANGLE B AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q415="
+  }
+
+  ADDRESS Q416
+  {
+      # END ANGLE B AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q416="
+  }
+
+  ADDRESS Q417
+  {
+      # INCID. ANGLE B AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q417="
+  }
+
+  ADDRESS Q418
+  {
+      # MEAS. POINTS B AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q418="
+  }
+
+  ADDRESS Q419
+  {
+      # START ANGLE C AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q419="
+  }
+
+  ADDRESS Q420
+  {
+      # END ANGLE C AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q420="
+  }
+
+  ADDRESS Q421
+  {
+      # INCID. ANGLE C AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q421="
+  }
+
+  ADDRESS Q422
+  {
+      # MEAS. POINTS C AXIS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q422="
+  }
+
+  ADDRESS Q423
+  {
+      # NO. OF PROBE POINTS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q423="
+  }
+
+  ADDRESS Q424
+  {
+      # WORKPC. BLANK SIDE 1
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q424="
+  }
+
+  ADDRESS Q425
+  {
+      # WORKPC. BLANK SIDE 2
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q425="
+  }
+
+  ADDRESS Q426
+  {
+      # DIR. OF SPINDLE ROT.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q426="
+  }
+
+  ADDRESS Q427
+  {
+      # ROT. SPEED INFEED/OUT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q427="
+  }
+
+  ADDRESS Q428
+  {
+      # DRILLING SPEED
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q428="
+  }
+
+  ADDRESS Q429
+  {
+      # COOLANT ON
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q429="
+  }
+
+  ADDRESS Q430
+  {
+      # COOLANT OFF
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q430="
+  }
+
+  ADDRESS Q431
+  {
+      # PRESET
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q431="
+  }
+
+  ADDRESS Q432
+  {
+      # BACKLASH, ANG. RANGE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q432="
+  }
+
+  ADDRESS Q433
+  {
+      # CALIBRATE LENGTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q433="
+  }
+
+  ADDRESS Q434
+  {
+      # DATUM
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q434="
+  }
+
+  ADDRESS Q435
+  {
+      # DWELL DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q435="
+  }
+
+  ADDRESS Q436
+  {
+      # INFEED PER REV.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q436="
+  }
+
+  ADDRESS Q437
+  {
+      # APPROACH POSITION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q437="
+  }
+
+  ADDRESS Q439
+  {
+      # FEED RATE REFERENCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q439="
+  }
+
+  ADDRESS Q441
+  {
+      # INFEED
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q441="
+  }
+
+  ADDRESS Q445
+  {
+      # CLEARANCE HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q445="
+  }
+
+  ADDRESS Q449
+  {
+      # FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q449="
+  }
+
+  ADDRESS Q450
+  {
+      # MAXIMUM RUNOUT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q450="
+  }
+
+  ADDRESS Q451
+  {
+      # SPEED
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q451="
+  }
+
+  ADDRESS Q460
+  {
+      # SET-UP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q460="
+  }
+
+  ADDRESS Q461
+  {
+      # THREAD ORIENTATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q461="
+  }
+
+  ADDRESS Q463
+  {
+      # MAX. CUTTING DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q463="
+  }
+
+  ADDRESS Q464
+  {
+      # DIMENSION TYPE FOR TAPER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q464="
+  }
+
+  ADDRESS Q465
+  {
+      # APPROACH PATH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q465="
+  }
+
+  ADDRESS Q466
+  {
+      # OVERRUN PATH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q466="
+  }
+
+  ADDRESS Q467
+  {
+      # ANGLE OF INFEED
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q467="
+  }
+
+  ADDRESS Q468
+  {
+      # TYPE OF INFEED
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q468="
+  }
+
+  ADDRESS Q469
+  {
+      # TAPER ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q469="
+  }
+
+  ADDRESS Q470
+  {
+      # START ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q470="
+  }
+
+  ADDRESS Q471
+  {
+      # THREAD POSITION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q471="
+  }
+
+  ADDRESS Q472
+  {
+      # THREAD PITCH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q472="
+  }
+
+  ADDRESS Q473
+  {
+      # THREAD DEPTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q473="
+  }
+
+  ADDRESS Q474
+  {
+      # RUNOUT OF THREAD
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q474="
+  }
+
+  ADDRESS Q475
+  {
+      # NUMBER OF STARTS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q475="
+  }
+
+  ADDRESS Q476
+  {
+      # NO. OF AIR CUTS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q476="
+  }
+
+  ADDRESS Q478
+  {
+      # ROUGHING FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q478="
+  }
+
+  ADDRESS Q479
+  {
+      # CUTTING LIMIT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q479="
+  }
+
+  ADDRESS Q480
+  {
+      # LIMIT VALUE FOR DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q480="
+  }
+
+  ADDRESS Q482
+  {
+      # LIMIT VALUE IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q482="
+  }
+
+  ADDRESS Q483
+  {
+      # OVERSIZE FOR DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q483="
+  }
+
+  ADDRESS Q484
+  {
+      # OVERSIZE IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q484="
+  }
+
+  ADDRESS Q485
+  {
+      # OVERSIZE ON BLANK
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q485="
+  }
+
+  ADDRESS Q486
+  {
+      # CUTTING LINES
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q486="
+  }
+
+  ADDRESS Q487
+  {
+      # PLUNGE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q487="
+  }
+
+  ADDRESS Q488
+  {
+      # PLUNGING FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q488="
+  }
+
+  ADDRESS Q491
+  {
+      # CONTOUR START RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q491="
+  }
+
+  ADDRESS Q492
+  {
+      # CONTOUR START IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q492="
+  }
+
+  ADDRESS Q493
+  {
+      # DIAMETER AT END OF CONTOUR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q493="
+  }
+
+  ADDRESS Q494
+  {
+      # CONTOUR END IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q494="
+  }
+
+  ADDRESS Q495
+  {
+      # ANGLE OF SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q495="
+  }
+
+  ADDRESS Q496
+  {
+      # ANGLE OF SECOND SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q496="
+  }
+
+  ADDRESS Q497
+  {
+      # PRECISION ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q497="
+  }
+
+  ADDRESS Q498
+  {
+      # REVERSE TOOL
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q498="
+  }
+
+  ADDRESS Q499
+  {
+      # REVERSE CONTOUR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q499="
+  }
+
+  ADDRESS Q500
+  {
+      # RADIUS OF CONTOUR EDGE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q500="
+  }
+
+  ADDRESS Q501
+  {
+      # TYPE OF STARTING ELEMENT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q501="
+  }
+
+  ADDRESS Q502
+  {
+      # SIZE OF STARTING ELEMENT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q502="
+  }
+
+  ADDRESS Q503
+  {
+      # TYPE OF END ELEMENT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q503="
+  }
+
+  ADDRESS Q504
+  {
+      # SIZE OF END ELEMENT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q504="
+  }
+
+  ADDRESS Q505
+  {
+      # FINISHING FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q505="
+  }
+
+  ADDRESS Q506
+  {
+      # CONTOUR SMOOTHING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q506="
+  }
+
+  ADDRESS Q507
+  {
+      # MACHINING DIRECTION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q507="
+  }
+
+  ADDRESS Q508
+  {
+      # OFFSET WIDTH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q508="
+  }
+
+  ADDRESS Q509
+  {
+      # DEPTH COMPENSATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q509="
+  }
+
+  ADDRESS Q512
+  {
+      # FEED RATE FOR APPROACHING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q512="
+  }
+
+  ADDRESS Q513
+  {
+      # CHARACTER HEIGHT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q513="
+  }
+
+  ADDRESS Q514
+  {
+      # SPACE FACTOR
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q514="
+  }
+
+  ADDRESS Q515
+  {
+      # FONT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q515="
+  }
+
+  ADDRESS Q516
+  {
+      # TEXT LAYOUT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q516="
+  }
+
+  ADDRESS Q517
+  {
+      # CIRCLE RADIUS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q517="
+  }
+
+  ADDRESS Q529
+  {
+      # MACHINING OPERATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q529="
+  }
+
+  ADDRESS Q530
+  {
+      # INCLINED MACHINING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q530="
+  }
+
+  ADDRESS Q531
+  {
+      # INCLINED ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q531="
+  }
+
+  ADDRESS Q532
+  {
+      # FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q532="
+  }
+
+  ADDRESS Q533
+  {
+      # PREFERRED DIRECTION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q533="
+  }
+
+  ADDRESS Q535
+  {
+      # ECCENTRIC TURNING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q535="
+  }
+
+  ADDRESS Q536
+  {
+      # STOP BEFORE RUNNING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q536="
+  }
+
+  ADDRESS Q540
+  {
+      # MODULE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q540="
+  }
+
+  ADDRESS Q541
+  {
+      # NUMBER OF TEETH
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q541="
+  }
+
+  ADDRESS Q542
+  {
+      # OUTSIDE DIAMETER
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q542="
+  }
+
+  ADDRESS Q543
+  {
+      # TROUGH-TIP CLEARANCE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q543="
+  }
+
+  ADDRESS Q544
+  {
+      # ANGLE OF INCLINATION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q544="
+  }
+
+  ADDRESS Q545
+  {
+      # TOOL LEAD ANGLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q545="
+  }
+
+  ADDRESS Q546
+  {
+      # CHANGE TOOL DIRECTN.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q546="
+  }
+
+  ADDRESS Q547
+  {
+      # ANG. OFFSET, SPINDLE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q547="
+  }
+
+  ADDRESS Q550
+  {
+      # MACHINING SIDE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q550="
+  }
+
+  ADDRESS Q551
+  {
+      # STARTING POINT IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q551="
+  }
+
+  ADDRESS Q552
+  {
+      # END POINT IN Z
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q552="
+  }
+
+  ADDRESS Q553
+  {
+      # TOOL LENGTH OFFSET
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q553="
+  }
+
+  ADDRESS Q560
+  {
+      # SPINDLE COUPLING
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q560="
+  }
+
+  ADDRESS Q561
+  {
+      # TURNING TOOL CONVERSION
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q561="
+  }
+
+  ADDRESS Q570
+  {
+      # ASCERTAIN THE LOAD
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q570="
+  }
+
+  ADDRESS Q571
+  {
+      # REFERENCE CIRCUIT DIA.
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q571="
+  }
+
+  ADDRESS Q572
+  {
+      # NUMBER OF CORNERS
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q572="
+  }
+
+  ADDRESS Q573
+  {
+      # REFERENCE CIRCUIT
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q573="
+  }
+
+  ADDRESS Q613
+  {
+      # KEEP CAMERA LID OPEN
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q613="
+  }
+
+  ADDRESS Q616
+  {
+      # POSITION FEED RATE
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q616="
+  }
+
+  ADDRESS Q617
+  {
+      # REFERENCE IMAGES
+      FORMAT      String_Cycle
+      FORCE       always
+      LEADER      "Q617="
+  }
+
+############ BLOCK TEMPLATE DECLARATIONS #############
+  BLOCK_TEMPLATE header_program
+  {
+       header_program[$lib_nc_header_name]
+  }
+
+  BLOCK_TEMPLATE header_subprogram
+  {
+       header_subprogram[$lib_spf(value,subprogram_output_name)]
+  }
+
+  BLOCK_TEMPLATE trailer_program
+  {
+       trailer_program[$lib_nc_header_name]
+  }
+
+  BLOCK_TEMPLATE auxfun
+  {
+       M[$mom_auxfun]
+  }
+
+  BLOCK_TEMPLATE blank_form_1
+  {
+       Text[BLK FORM 0.1 Z]
+       X[0]
+       Y[0]
+       Z[-20]
+  }
+
+  BLOCK_TEMPLATE blank_form_2
+  {
+       Text[BLK FORM 0.2]
+       X[100]
+       Y[100]
+       Z[0]
+  }
+
+  BLOCK_TEMPLATE channel_init
+  {
+       G_plane[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+       fourth_axis[9999.999]
+       fifth_axis[9999.999]
+       I[99999.999]
+       J[99999.999]
+       K[99999.999]
+       S[99999]
+       H[99]
+       G_cutcom[""]
+  }
+  BLOCK_TEMPLATE circular_move
+  {
+       Text[CC]
+       I[$mom_pos_arc_center(0)]
+       J[$mom_pos_arc_center(1)]
+       K[$mom_pos_arc_center(2)]
+  }
+
+  BLOCK_TEMPLATE circular_move_1
+  {
+       G_motion[C]\opt
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       circle_direction[$mom_sys_circle_code($mom_arc_direction)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE circular_move_turbo
+  {
+       Text[CC]
+       I[^CENTERX]
+       J[^CENTERY]
+       K[^CENTERZ]
+  }
+
+  BLOCK_TEMPLATE circular_move_1_turbo
+  {
+       G_motion[C]\opt
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       circle_direction[^sys_circle_code(ARC_DIRECTION)]
+       G_cutcom[^sys_cutcom_code(CUTCOM_STATUS)]\opt
+       F[^FEED]
+       F_param[ ]\nows
+       M_coolant[^sys_coolant_code(COOLNT_STATUS)]\opt
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+  }
+
+  BLOCK_TEMPLATE circular_move_radius
+  {
+       G_motion[CR]\opt
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       R[$mom_arc_radius]
+       circle_direction[$mom_sys_circle_code($mom_arc_direction)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE clamp_fifth_axis
+  {
+       M_clamp_fifth[$mom_sys_clamp_code_fifth]
+  }
+
+  BLOCK_TEMPLATE clamp_fourth_axis
+  {
+       M_clamp_fourth[$mom_sys_clamp_code_fourth]
+  }
+
+  BLOCK_TEMPLATE coolant_off
+  {
+       M_coolant[$mom_sys_coolant_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE coolant_on
+  {
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]
+  }
+
+  BLOCK_TEMPLATE cutcom_off
+  {
+       cutter_comp[R0]
+  }
+
+  BLOCK_TEMPLATE cycl_def_7_0
+  {
+       Text[CYCL DEF 7.0 $lib_linked_var(LIB_GE_MSG_CTR@DATUM SHIFT)]
+  }
+
+  BLOCK_TEMPLATE cycl_def_9_0
+  {
+       Text[CYCL DEF 9.0 $lib_linked_var(LIB_GE_MSG_CTR@DWELL TIME)]
+  }
+
+  BLOCK_TEMPLATE cycl_def_13_0
+  {
+       Text[CYCL DEF 13.0 $lib_linked_var(LIB_GE_MSG_CTR@ORIENTATION)]
+  }
+
+  BLOCK_TEMPLATE cycl_def_13_1
+  {
+       Text[CYCL DEF 13.1 $lib_linked_var(LIB_GE_MSG_CTR@ANGLE)]
+       SPOS[$mom_sys_spindle_orient_value]\opt
+  }
+
+  BLOCK_TEMPLATE cycl_def_19_0
+  {
+       Text[CYCL DEF 19.0 $lib_linked_var(LIB_GE_MSG_CTR@WORKING PLANE)]
+  }
+
+  BLOCK_TEMPLATE cycl_def_19_1
+  {
+       Text[CYCL DEF 19.1]
+       fourth_axis[$lib_coord_out_ang_fourth]
+       fifth_axis[$lib_coord_out_ang_fifth]
+  }
+
+  BLOCK_TEMPLATE cycl_def_19_1_init
+  {
+       Text[CYCL DEF 19.1]
+       A[$lib_coord_out_ang_A]
+       B[$lib_coord_out_ang_B]
+       C[$lib_coord_out_ang_C]
+  }
+
+  BLOCK_TEMPLATE cycl_def_19_1_reset
+  {
+       Text[CYCL DEF 19.1]
+       A[0]
+       B[0]
+       C[0]
+  }
+
+  BLOCK_TEMPLATE cycle_block_dwell
+  {
+       cycle_dwell[$mom_cycle_delay]
+  }
+  BLOCK_TEMPLATE cycle_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_cycle_rapid_to_pos(0)*$x_factor]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Z[$mom_cycle_rapid_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE cycle_parameters
+  {
+       G_motion[$mom_sys_linear_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE cycle_parameters_1
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_cycle_feed_to_pos(0)*$x_factor]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Text[R0 F MAX]
+  }
+
+  BLOCK_TEMPLATE cycle_rapidtoZ
+  {
+       G_motion[$mom_sys_rapid_code]
+       Z[$mom_cycle_rapid_to_pos(2)]
+       Text[F MAX]
+       cutter_comp[$cutter_comp]\opt
+  }
+
+  BLOCK_TEMPLATE delay
+  {
+       dwell[$mom_delay_value]
+  }
+
+  BLOCK_TEMPLATE end_of_subprogram
+  {
+       trailer_subprogram[$lib_spf(subprogram_call_end_name)]
+  }
+
+  BLOCK_TEMPLATE end_of_program
+  {
+       M[$mom_sys_rewind_code]
+  }
+
+  BLOCK_TEMPLATE external_subprogram
+  {
+       CALL[$lib_spf(value,subprogram_output_file_basename)]
+  }
+
+  BLOCK_TEMPLATE fifth_axis_rotate_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       fifth_axis[$mom_out_angle_pos(1)]
+  }
+
+  BLOCK_TEMPLATE fourth_axis_rotate_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+  }
+
+  BLOCK_TEMPLATE function_mode
+  {
+       function_mode[$lib_var(machine_mode)]
+  }
+
+  BLOCK_TEMPLATE feedrate_mode
+  {
+       F_mode[$mom_sys_feed_rate_mode_code($feed_mode)]\opt
+  }
+
+  BLOCK_TEMPLATE helix_move
+  {
+       G_motion[CP]
+       helix_angle[$helix_angle]
+       helix_height[$helix_height]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       circle_direction[$mom_sys_circle_code($mom_arc_direction)]
+       F[$feed]
+       F_param[ ]\nows
+  }
+
+  BLOCK_TEMPLATE helix_move_1
+  {
+       Text[CC]
+       I[$mom_pos_arc_center(0)]
+       J[$mom_pos_arc_center(1)]
+       K[$mom_pos_arc_center(2)]
+  }
+
+  BLOCK_TEMPLATE linear_move
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       NX_vector[$mom_contact_normal(0)]\opt
+       NY_vector[$mom_contact_normal(1)]\opt
+       NZ_vector[$mom_contact_normal(2)]\opt
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+
+  BLOCK_TEMPLATE linear_move_prepos_tcpm
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       NX_vector[$mom_contact_normal(0)]\opt
+       NY_vector[$mom_contact_normal(1)]\opt
+       NZ_vector[$mom_contact_normal(2)]\opt
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+       M130[$single_line_tcpm_code]
+  }
+
+  BLOCK_TEMPLATE linear_move_sim
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_mcs_goto(0)]
+       Y[$mom_mcs_goto(1)]
+       Z[$mom_mcs_goto(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       F[$feed]
+       F_param[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+
+  BLOCK_TEMPLATE linear_move_turbo
+  {
+       G_motion[^sys_linear_code]
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       fourth_axis[^POS4]
+       fifth_axis[^POS5]
+       X_vector[^tool_axis0]\opt
+       Y_vector[^tool_axis1]\opt
+       Z_vector[^tool_axis2]\opt
+       G_cutcom[^sys_cutcom_code(CUTCOM_STATUS)]\opt
+       F[^FEED]
+       F_param[ ]\nows
+       M_coolant[^sys_coolant_code(COOLNT_STATUS)]\opt
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+  }
+
+  BLOCK_TEMPLATE local_zero
+  {
+       local_zero[$lib_local_zero_register]
+  }
+
+  BLOCK_TEMPLATE local_zero_xoffset
+  {
+       Text[CYCL DEF 7.1]
+       X[$mom_origin(0)]
+  }
+
+  BLOCK_TEMPLATE local_zero_yoffset
+  {
+       Text[CYCL DEF 7.2]
+       Y[$mom_origin(1)]
+  }
+
+  BLOCK_TEMPLATE local_zero_zoffset
+  {
+       Text[CYCL DEF 7.3]
+       Z[$mom_origin(2)]
+  }
+
+  BLOCK_TEMPLATE main_zero
+  {
+       main_zero[$lib_main_zero_register]
+  }
+
+  BLOCK_TEMPLATE manual_tool_change
+  {
+       M[$mom_sys_program_stop_code]
+  }
+
+  BLOCK_TEMPLATE opstop
+  {
+       M[$mom_sys_optional_stop_code]\opt\nows
+  }
+
+  BLOCK_TEMPLATE optimized_rot_axis_on
+  {
+       M_axisopt[126]
+  }
+  BLOCK_TEMPLATE optimized_rot_axis_off
+  {
+       M_axisopt[127]
+  }
+  BLOCK_TEMPLATE output_m128
+  {
+       M[128]
+  }
+
+  BLOCK_TEMPLATE output_m129
+  {
+       M[129]
+  }
+
+  BLOCK_TEMPLATE set_tcpm_on
+  {
+       Text[FUNCTION TCPM]
+       Text[$lib_linked_var(CONF_CTRL_setting@tcpm_feed_mode)]
+       Text[$lib_linked_var(CONF_CTRL_setting@tcpm_axis_mode)]
+       Text[$lib_linked_var(CONF_CTRL_setting@tcpm_pathctrl_mode)]
+  }
+
+  BLOCK_TEMPLATE plane_init
+  {
+       Text[PLANE]
+       Text[$lib_linked_var(CONF_ITNC530_PLANE@definition)]
+       plane_angle_a[$lib_coord_ang_A]
+       plane_angle_b[$lib_coord_ang_B]
+       plane_angle_c[$lib_coord_ang_C]
+       plane_motion[$lib_linked_var(CONF_ITNC530_PLANE@motion_init)]
+       plane_dist[$lib_linked_var(CONF_ITNC530_PLANE@dist_init)]
+       plane_feed[$lib_linked_var(CONF_ITNC530_PLANE@feed)]
+       plane_seq[$lib_linked_var(CONF_ITNC530_PLANE@seq)]
+       plane_rot[$lib_linked_var(CONF_ITNC530_PLANE@rot_mode)]
+  }
+
+  BLOCK_TEMPLATE plane_reset
+  {
+       Text[PLANE]
+       Text[RESET]
+       plane_motion[$lib_linked_var(CONF_ITNC530_PLANE@motion_reset)]
+       plane_dist[$lib_linked_var(CONF_ITNC530_PLANE@dist_reset)]
+       plane_feed[$lib_linked_var(CONF_ITNC530_PLANE@feed)]
+  }
+
+  BLOCK_TEMPLATE post_cycle_set
+  {
+       G_plane[$mom_sys_cutcom_plane_code($mom_cutcom_plane)]\opt
+       G_motion[$mom_sys_cycle_reps_code]
+       X[$mom_cycle_feed_to_pos(0)]
+       Y[$mom_cycle_feed_to_pos(1)]
+       Z[$mom_cycle_feed_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       R[$mom_cycle_rapid_to_pos($mom_cycle_spindle_axis)]
+       F[$feed]
+       F_param[ ]\nows
+  }
+
+  BLOCK_TEMPLATE prefun
+  {
+       G[$mom_prefun]
+  }
+
+  BLOCK_TEMPLATE rapid_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE rapid_move_prepos_tcpm
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+       M130[$single_line_tcpm_code]
+  }
+
+  BLOCK_TEMPLATE rapid_move_sim
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_mcs_goto(0)]
+       Y[$mom_mcs_goto(1)]
+       Z[$mom_mcs_goto(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       X_vector[$mom_tool_axis(0)]
+       Y_vector[$mom_tool_axis(1)]
+       Z_vector[$mom_tool_axis(2)]
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE rapid_move_turbo
+  {
+       G_motion[^sys_linear_code]
+       X[^POSX]
+       Y[^POSY]
+       Z[^POSZ]
+       fourth_axis[^POS4]
+       fifth_axis[^POS5]
+       G_cutcom[^sys_cutcom_code(CUTCOM_STATUS)]\opt
+       FMAX[ ]\nows
+       M_coolant[^sys_coolant_code(COOLNT_STATUS)]\opt
+       M_spindle[^sys_spindle_direction_code(SPINDLE_DIRECTION)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_rotary
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE rapid_rotary_sixth_axis
+  {
+       G_motion[$mom_sys_rapid_code]
+       sixth_axis[$lib_c_angle]
+       FMAX[ ]\nows
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+
+  BLOCK_TEMPLATE rapid_spindle
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]
+  }
+
+  BLOCK_TEMPLATE rapid_traverse
+  {
+       G_motion[$mom_sys_rapid_code]
+       X[$mom_pos(0)*$x_factor]
+       Y[$mom_pos(1)]
+       Z[$mom_pos(2)]
+       G_cutcom[$mom_sys_cutcom_code($mom_cutcom_status)]\opt
+       FMAX[ ]\nows
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]\opt
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+
+  BLOCK_TEMPLATE reset_csys
+  {
+       Text[CYCL DEF 19.1]
+       fourth_axis[0.0]
+       fifth_axis[0.0]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE return_home_4th
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[0]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE return_home_4th5th
+  {
+       G_motion[$mom_sys_rapid_code]
+       fourth_axis[0]
+       fifth_axis[0]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE return_home_5th
+  {
+       G_motion[$mom_sys_rapid_code]
+       fifth_axis[0]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE return_home_X
+  {
+       G_motion[$mom_sys_rapid_code]
+       X_home[$mom_sys_home_pos(0)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_XY
+  {
+       G_motion[$mom_sys_rapid_code]
+       X_home[$mom_sys_home_pos(0)]
+       Y_home[$mom_sys_home_pos(1)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_Y
+  {
+       G_motion[$mom_sys_rapid_code]
+       Y_home[$mom_sys_home_pos(1)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_YZ
+  {
+       G_motion[$mom_sys_rapid_code]
+       Y_home[$mom_sys_home_pos(1)]
+       Z_home[$mom_sys_home_pos(2)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_ZY
+  {
+       G_motion[$mom_sys_rapid_code]
+       Y_home[$mom_sys_home_pos(1)]
+       Z_home[$mom_sys_home_pos(2)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_Z
+  {
+       G_motion[$mom_sys_rapid_code]
+       Z_home[$mom_sys_home_pos(2)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_home_ZX
+  {
+       G_motion[$mom_sys_rapid_code]
+       X_home[$mom_sys_home_pos(0)]
+       Z_home[$mom_sys_home_pos(2)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_motion
+  {
+       M_coolant[$mom_sys_coolant_code(OFF)]
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE return_move
+  {
+       G_motion[$mom_sys_rapid_code]
+       X_home[$mom_sys_home_pos(0)]
+       Y_home[$mom_sys_home_pos(1)]
+       Z_home[$mom_sys_home_pos(2)]
+       FMAX[ ]\nows
+       M_gohome[$lib_linked_var(CONF_CTRL_setting@gohome_m_code)]
+  }
+
+  BLOCK_TEMPLATE return_move_TA
+  {
+       G_motion[$mom_sys_rapid_code]
+       M[140]
+       MB[$lib_ta_return_value]
+  }
+
+  BLOCK_TEMPLATE rewind_stop_code
+  {
+       Text[BEGIN PGM $mom_program_name]
+  }
+
+  BLOCK_TEMPLATE sequence_number
+  {
+       N[$mom_seqnum]
+  }
+
+  BLOCK_TEMPLATE sequence_number_turbo
+  {
+       N[^SEQNUM]
+  }
+
+  BLOCK_TEMPLATE set_csys
+  {
+       Text[CYCL DEF 19.1]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       FMAX[ ]\nows
+  }
+
+  BLOCK_TEMPLATE spindle_init
+  {
+       S[99999]
+       M_spindle[99]
+  }
+
+  BLOCK_TEMPLATE spindle_off
+  {
+       M_spindle[$mom_sys_spindle_direction_code(OFF)]
+  }
+
+  BLOCK_TEMPLATE spindle_orient
+  {
+       M_spindle[$mom_sys_spindle_orient_code]
+  }
+
+  BLOCK_TEMPLATE spindle_rpm
+  {
+       M_spindle[$mom_sys_spindle_direction_code($mom_spindle_direction)]\opt
+  }
+
+  BLOCK_TEMPLATE spline_start
+  {
+       Text[L]
+       X[$mom_nurbs_points(0,0)]
+       Y[$mom_nurbs_points(0,1)]
+       Z[$mom_nurbs_points(0,2)]
+  }
+
+  BLOCK_TEMPLATE stop
+  {
+       M[$mom_sys_program_stop_code]
+  }
+
+  BLOCK_TEMPLATE stop_init
+  {
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+  }
+
+  BLOCK_TEMPLATE tap_break_chip
+  {
+       G_motion[$mom_sys_linear_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(0)]
+       F[$feed]
+  }
+
+  BLOCK_TEMPLATE tap_break_chip_1
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_cycle_rapid_to_pos(0)]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Text[R0 F MAX]
+  }
+
+  BLOCK_TEMPLATE thread_mill
+  {
+       G_motion[$mom_sys_linear_code]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       F[$feed]
+       F_param[ ]\nows
+  }
+
+  BLOCK_TEMPLATE thread_mill_1
+  {
+       G_motion[$mom_sys_linear_code]
+       X[$mom_cycle_rapid_to_pos(0)]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Text[R0 F MAX]
+  }
+
+  BLOCK_TEMPLATE CYCL_32_0
+  {
+       Text[CYCL DEF 32.0 $lib_linked_var(LIB_GE_MSG_CTR@TOLERANCE)]
+  }
+
+  BLOCK_TEMPLATE CYCL_32_1
+  {
+       Text[CYCL DEF 32.1]
+       TOL[$lib_parameter_cycle(321)]
+  }
+
+  BLOCK_TEMPLATE CYCL_32_2
+  {
+       Text[CYCL DEF 32.2]
+       HSCMODE[$lib_parameter_cycle(320)]
+       TATOL[$lib_parameter_cycle(323)]
+  }
+
+  BLOCK_TEMPLATE tool_change
+  {
+       Text[TOOL CALL]
+       T[$mom_tool_number]
+       Tooldirection[$lib_linked_var(CONF_CTRL_setting@initial_tool_direction)]
+       S[$mom_spindle_speed]
+       F_tool_call[$mom_feed_cut_value]
+       DL_tool_call[0]
+       DR_tool_call[$lib_cutcom_radius*-1]
+  }
+
+  BLOCK_TEMPLATE tool_change_spindle_speed_change
+  {
+       Text[TOOL CALL]
+       S[$mom_spindle_speed]
+
+  }
+
+  BLOCK_TEMPLATE tool_change_init
+  {
+       I[99999.999]
+       G_plane[99]
+       X[99999.999]
+       Y[99999.999]
+       Z[99999.999]
+       fourth_axis[9999.999]
+       fifth_axis[9999.999]
+       J[99999.999]
+       K[99999.999]
+       S[99999]
+       F_tool_call[99999]
+       DL_tool_call[99999]
+       DR_tool_call[99999]
+       H[99]
+       G_cutcom[""]
+       F_mode[$mom_sys_feed_rate_mode_code(MMPM)]
+  }
+
+  BLOCK_TEMPLATE tool_change_name
+  {
+       Text[TOOL CALL]
+       T_name[$mom_tool_name]
+       Tooldirection[$lib_linked_var(CONF_CTRL_setting@initial_tool_direction)]
+       S[$mom_spindle_speed]
+       F_tool_call[$mom_feed_cut_value]
+       DL_tool_call[0]
+       DR_tool_call[$lib_cutcom_radius*-1]
+  }
+
+  BLOCK_TEMPLATE tool_change_number_name
+  {
+       Text[TOOL CALL]
+       T_name[$mom_tool_number]
+       Tooldirection[$lib_linked_var(CONF_CTRL_setting@initial_tool_direction)]
+       S[$mom_spindle_speed]
+       F_tool_call[$mom_feed_cut_value]
+       DL_tool_call[0]
+       DR_tool_call[$lib_cutcom_radius*-1]
+  }
+
+  BLOCK_TEMPLATE tool_change_zero
+  {
+       Text[TOOL CALL]
+       T[$lib_tool_number_zero]
+       Text[Z]
+  }
+
+  BLOCK_TEMPLATE tool_length_adjust
+  {
+       H[$mom_tool_adjust_register]
+  }
+
+  BLOCK_TEMPLATE tool_preselect
+  {
+       Text[TOOL DEF]
+       T[$mom_next_tool_number]
+  }
+
+  BLOCK_TEMPLATE tool_preselect_name
+  {
+       Text[TOOL DEF]
+       T_name[$mom_next_tool_name]
+  }
+
+  BLOCK_TEMPLATE tool_preselect_number_name
+  {
+       Text[TOOL DEF]
+       T_name[$mom_next_tool_number]
+  }
+
+  BLOCK_TEMPLATE unclamp_fifth_axis
+  {
+       M_clamp_fifth[$mom_sys_unclamp_code_fifth]
+  }
+
+  BLOCK_TEMPLATE unclamp_fourth_axis
+  {
+       M_clamp_fourth[$mom_sys_unclamp_code_fourth]
+  }
+
+  BLOCK_TEMPLATE comment_data
+  {
+       LF_XABS[$mom_pos(0)]
+       LF_YABS[$mom_pos(1)]
+       LF_ZABS[$mom_pos(2)]
+       LF_AAXIS[$mom_pos(3)]
+       LF_BAXIS[$mom_pos(4)]
+       LF_FEED[$mom_feed_rate]
+       LF_SPEED[$mom_spindle_speed]
+  }
+
+############ BLOCK TEMPLATE CYCLE DECLARATIONS #############
+
+  BLOCK_TEMPLATE CYCL_200
+  {
+       cycle_call[200]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@DRILLING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q210[$lib_parameter_cycle(210)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@210)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+  }
+
+  BLOCK_TEMPLATE CYCL_201
+  {
+       cycle_call[201]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@REAMING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+  }
+
+  BLOCK_TEMPLATE CYCL_202
+  {
+       cycle_call[202]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@BORING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q214[$lib_parameter_cycle(214)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@214)]
+       cycle_seperator[ ]
+       Q336[$lib_parameter_cycle(336)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@336)]
+  }
+
+  BLOCK_TEMPLATE CYCL_203
+  {
+       cycle_call[203]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@UNIVERSAL DRILLING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q210[$lib_parameter_cycle(210)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@210)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q212[$lib_parameter_cycle(212)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@212)]
+       cycle_seperator[ ]
+       Q213[$lib_parameter_cycle(213)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@213)]
+       cycle_seperator[ ]
+       Q205[$lib_parameter_cycle(205)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@205)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q256[$lib_parameter_cycle(256)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@256)]
+  }
+
+  BLOCK_TEMPLATE CYCL_204
+  {
+       cycle_call[204]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@BACK BORING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q249[$lib_parameter_cycle(249)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@249)]
+       cycle_seperator[ ]
+       Q250[$lib_parameter_cycle(250)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@250)]
+       cycle_seperator[ ]
+       Q251[$lib_parameter_cycle(251)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@251)]
+       cycle_seperator[ ]
+       Q252[$lib_parameter_cycle(252)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@252)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q254[$lib_parameter_cycle(254)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@254)]
+       cycle_seperator[ ]
+       Q255[$lib_parameter_cycle(255)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@255)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q214[$lib_parameter_cycle(214)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@214)]
+       cycle_seperator[ ]
+       Q336[$lib_parameter_cycle(336)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@336)]
+  }
+
+  BLOCK_TEMPLATE CYCL_205
+  {
+       cycle_call[205]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@UNIVERSAL PECKING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q212[$lib_parameter_cycle(212)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@212)]
+       cycle_seperator[ ]
+       Q205[$lib_parameter_cycle(205)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@205)]
+       cycle_seperator[ ]
+       Q258[$lib_parameter_cycle(258)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@258)]
+       cycle_seperator[ ]
+       Q259[$lib_parameter_cycle(259)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@259)]
+       cycle_seperator[ ]
+       Q257[$lib_parameter_cycle(257)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@257)]
+       cycle_seperator[ ]
+       Q256[$lib_parameter_cycle(256)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@256)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q379[$lib_parameter_cycle(379)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@379)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q395[$lib_parameter_cycle(395)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@395)]
+  }
+
+  BLOCK_TEMPLATE CYCL_206
+  {
+       cycle_call[206]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@TAPPING NEW)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$lib_parameter_cycle(206)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+  }
+
+  BLOCK_TEMPLATE CYCL_207
+  {
+       cycle_call[207]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@RIGID TAPPING NEW)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+  }
+
+  BLOCK_TEMPLATE CYCL_208
+  {
+       cycle_call[208]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@BORE MILLING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q334[$lib_parameter_cycle(334)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@334)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q335[$lib_parameter_cycle(335)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@335)]
+       cycle_seperator[ ]
+       Q342[$lib_parameter_cycle(342)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@342)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+  }
+
+  BLOCK_TEMPLATE CYCL_209
+  {
+       cycle_call[209]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@TAPPING W/ CHIP BRKG)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q257[$lib_parameter_cycle(257)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@257)]
+       cycle_seperator[ ]
+       Q256[$lib_parameter_cycle(256)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@256)]
+       cycle_seperator[ ]
+       Q336[$lib_parameter_cycle(336)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@336)]
+  }
+
+  BLOCK_TEMPLATE CYCL_241
+  {
+       cycle_call[241]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@SINGLE-LIP DEEP-HOLE DRILLING)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q206[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q211[$mom_cycle_delay]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@211)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q379[$lib_parameter_cycle(379)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@379)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q208[$lib_parameter_cycle(208)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@208)]
+       cycle_seperator[ ]
+       Q426[$lib_parameter_cycle(426)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@426)]
+       cycle_seperator[ ]
+       Q427[$lib_parameter_cycle(427)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@427)]
+       cycle_seperator[ ]
+       Q428[$lib_parameter_cycle(428)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@428)]
+       cycle_seperator[ ]
+       Q429[$lib_parameter_cycle(429)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@429)]
+       cycle_seperator[ ]
+       Q430[$lib_parameter_cycle(430)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@430)]
+       cycle_seperator[ ]
+       Q435[$lib_parameter_cycle(435)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@435)]
+  }
+
+  BLOCK_TEMPLATE CYCL_252
+  {
+       cycle_call[252]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@CIRCULAR POCKET)]
+       cycle_seperator[ ]
+       Q215[$lib_parameter_cycle(215)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@215)]
+       cycle_seperator[ ]
+       Q223[$lib_parameter_cycle(223)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@223)]
+       cycle_seperator[ ]
+       Q368[$lib_parameter_cycle(368)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@368)]
+       cycle_seperator[ ]
+       Q207[$feed]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q202[$lib_parameter_cycle(202)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@202)]
+       cycle_seperator[ ]
+       Q369[$lib_parameter_cycle(369)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@369)]
+       cycle_seperator[ ]
+       Q206[$lib_parameter_cycle(206)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@206)]
+       cycle_seperator[ ]
+       Q338[$lib_parameter_cycle(338)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@338)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q370[$lib_parameter_cycle(370)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@370)]
+       cycle_seperator[ ]
+       Q366[$lib_parameter_cycle(366)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@366)]
+       cycle_seperator[ ]
+       Q385[$lib_parameter_cycle(385)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@385)]
+  }
+
+  BLOCK_TEMPLATE CYCL_262
+  {
+       cycle_call[262]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@THREAD MILLING)]
+       cycle_seperator[ ]
+       Q335[$lib_parameter_cycle(335)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@335)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q355[$lib_parameter_cycle(355)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@355)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q207[$lib_parameter_cycle(207)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+  }
+
+  BLOCK_TEMPLATE CYCL_263
+  {
+       cycle_call[263]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@THREAD MLLNG/CNTSNKG)]
+       cycle_seperator[ ]
+       Q335[$lib_parameter_cycle(335)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@335)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q356[$lib_parameter_cycle(356)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@356)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q357[$lib_parameter_cycle(357)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@357)]
+       cycle_seperator[ ]
+       Q358[$lib_parameter_cycle(358)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@358)]
+       cycle_seperator[ ]
+       Q359[$lib_parameter_cycle(359)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@359)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q254[$lib_parameter_cycle(254)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@254)]
+       cycle_seperator[ ]
+       Q207[$lib_parameter_cycle(207)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+  }
+
+  BLOCK_TEMPLATE CYCL_265
+  {
+       cycle_call[265]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@HEL. THREAD DRLG/MLG)]
+       cycle_seperator[ ]
+       Q335[$lib_parameter_cycle(335)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@335)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q358[$lib_parameter_cycle(358)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@358)]
+       cycle_seperator[ ]
+       Q359[$lib_parameter_cycle(359)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@359)]
+       cycle_seperator[ ]
+       Q360[$lib_parameter_cycle(360)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@360)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q254[$lib_parameter_cycle(254)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@254)]
+       cycle_seperator[ ]
+       Q207[$lib_parameter_cycle(207)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+  }
+
+  BLOCK_TEMPLATE CYCL_267
+  {
+       cycle_call[267]\nows
+       cycle_comment[$lib_linked_var(LIB_GE_MSG_CTR@OUTSIDE THREAD MLLNG)]
+       cycle_seperator[ ]
+       Q335[$lib_parameter_cycle(335)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@335)]
+       cycle_seperator[ ]
+       Q239[$lib_parameter_cycle(239)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@239)]
+       cycle_seperator[ ]
+       Q201[$mom_cycle_feed_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@201)]
+       cycle_seperator[ ]
+       Q355[$lib_parameter_cycle(355)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@355)]
+       cycle_seperator[ ]
+       Q253[$lib_parameter_cycle(253)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@253)]
+       cycle_seperator[ ]
+       Q351[$lib_parameter_cycle(351)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@351)]
+       cycle_seperator[ ]
+       Q200[$mom_cycle_rapid_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@200)]
+       cycle_seperator[ ]
+       Q358[$lib_parameter_cycle(358)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@358)]
+       cycle_seperator[ ]
+       Q359[$lib_parameter_cycle(359)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@359)]
+       cycle_seperator[ ]
+       Q203[$mom_pos($mom_cycle_spindle_axis)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@203)]
+       cycle_seperator[ ]
+       Q204[$mom_cycle_retract_to]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@204)]
+       cycle_seperator[ ]
+       Q254[$lib_parameter_cycle(254)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@254)]
+       cycle_seperator[ ]
+       Q207[$lib_parameter_cycle(207)]
+       cycle_description[$lib_linked_var(LIB_GE_MSG_CYCLE_CODE@207)]
+  }
+}

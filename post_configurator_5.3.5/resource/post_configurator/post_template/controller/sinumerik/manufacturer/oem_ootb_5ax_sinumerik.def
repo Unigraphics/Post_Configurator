@@ -1,0 +1,19 @@
+MACHINE SIEMENS840D
+
+FORMATTING
+{
+  SEQUENCE sequence_number 10 10 1 99999999
+
+  BLOCK_TEMPLATE cycle_move 
+  {
+       X[$mom_cycle_rapid_to_pos(0)]
+       Y[$mom_cycle_rapid_to_pos(1)]
+       Z[$mom_cycle_rapid_to_pos(2)]
+       fourth_axis[$mom_out_angle_pos(0)]
+       fifth_axis[$mom_out_angle_pos(1)]
+       M_coolant[$mom_sys_coolant_code($mom_coolant_mode)]
+       F[$mom_cycle_feed_rate]
+       D[$mom_tool_adjust_register]\opt
+  }
+}
+

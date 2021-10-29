@@ -1,0 +1,10 @@
+#############################################################################################
+#
+#	Copyright 2014-2020 Siemens Product Lifecycle Management Software Inc.
+#				All Rights Reserved.
+#
+#############################################################################################
+
+MACHINE SIEMENS840D
+
+INCLUDE { $UGII_CAM_USER_DEF_EVENT_DIR/ude.cdl }
